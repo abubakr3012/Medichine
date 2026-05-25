@@ -45,7 +45,7 @@ def register(request):
         elif User.objects.filter(email=email).exists():
             return render(request,'accounts/register.html',{'error':'this email is already taken'})
 
-        user=User.objects.create_user(username=username,email=email,password=password,phone=phone)
+        user=User.objects.create_user(username=username,email=email,password=password,phone=phone, role='patient')
 
         user.is_active=False
         user.save()

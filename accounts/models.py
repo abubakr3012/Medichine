@@ -19,6 +19,7 @@ class User(AbstractUser):
         max_length=20,
         unique=True
     )
+    age=models.PositiveIntegerField()
 
     def __str__(self):
         return self.username
