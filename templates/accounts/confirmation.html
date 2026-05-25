@@ -1,0 +1,17 @@
+{% extends "accounts/base.html" %}
+{% block main %}
+<form action="{% url 'confirm' %}" method="post">
+     {% csrf_token %}
+    <label for="username">username</label>
+    <input type="text" placeholder="Enter your username" name="username" id="username" value="{{username}}" required>
+    <label for="code">Code</label>
+    <input type="text" placeholder="Enter code" name="code" id="code" required>
+    <button type="submit">Confirm </button>
+    {% if error %}
+        <p>{{error}}</p>
+    {% endif %}
+</form>
+<div class="auth-link">
+    <p>Already confirmed? <a href="{% url 'login' %}">Sign In</a></p>
+</div>
+{% endblock %}

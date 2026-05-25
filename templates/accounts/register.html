@@ -1,0 +1,23 @@
+{% extends "accounts/base.html" %}
+{% block main %}
+<h2>Register</h2>
+<form action="" method="post">
+    {% csrf_token %}
+    <label for="username">username</label>
+    <input type="text" placeholder="Enter your username" name="username" id="username">
+    <label for="email">Email</label>
+    <input type="email" placeholder="Enter your email" name="email" id="email">
+    <label for="password">password</label>
+    <input type="password" placeholder="Enter your password" name="password" id="password">
+    <label for="password2">Confirm Password</label>
+    <input type="password" placeholder="Confirm password" name="password2" id="password2">
+    <button type="submit">Create Account</button>
+    {% if error %}
+        <p>{{error}}</p>
+    {% endif %}
+</form>
+<div class="auth-link">
+    <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+    <p>Already received a code? <a href="{% url 'confirm' %}">Confirm email</a></p>
+</div>
+{% endblock %}

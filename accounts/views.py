@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+
 from django.contrib.auth.decorators import login_required,permission_required
 from django.shortcuts import render,redirect
 from django.contrib.auth import login,logout,authenticate
@@ -6,6 +6,10 @@ from random import randint
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import EmailConfirm,ResetPassword
+from django.contrib.auth import get_user_model
+
+User=get_user_model()
+
 
 def send_confirmation_email(user):
     code=randint(100000,999999)
@@ -16,7 +20,7 @@ def send_confirmation_email(user):
             subject='Confirm your password',
             message=f'''
 Hello mr(ms) {user.username}\n
-Welcome to our RentaCarSite
+Welcome to our Medichine
 Please confirm your password {code}
 ''',
 from_email=settings.DEFAULT_FROM_EMAIL,
@@ -62,7 +66,7 @@ def login_user(request):
                 return render(request,'accounts/login.html',{'error':'username or password is wrong'})
         else:
             login(request,user)
-            return redirect('/clubs/')
+            return redirect('/redirect_dashboard/')
     else:
         return render(request,'accounts/login.html')
 
@@ -150,3 +154,52 @@ def reset_confirm(request):
         return redirect('login')
 
     return redirect('forget_password')
+
+@login_required
+def redirect_dashboard(request):
+
+    if request.user.role == 'doctor':
+        return redirect('doctor_dashboard')
+
+    elif request.user.role == 'patient':
+        return redirect('patient_dashboard')
+
+    elif request.user.role == 'admin':
+        return redirect('admin_dashboard')
+
+    return redirect('login')
+
+
+@login_required
+def patient_dashboard(request):
+
+    return render(
+        request,
+        'dashboard/patient_dashboard.html',
+        {
+            'user': request.user
+        }
+    )
+
+
+@login_required
+def doctor_dashboard(request):
+
+    return render(
+        request,
+        'dashboard/doctor_dashboard.html',
+        {
+            'user': request.user
+        }
+    )
+
+@login_required
+def admin_dashboard(request):
+
+    return render(
+        request,
+        'dashboard/admin_dashboard.html',
+        {
+            'user': request.user
+        }
+    )

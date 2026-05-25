@@ -1,0 +1,21 @@
+{% extends 'accounts/base.html' %}
+{% block main %}
+<h2>Reset Password</h2>
+<form action="{% url 'reset_confirm' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="email" value="{{ email }}">
+    <label for="code">Code</label>
+    <input type="text" name="code" placeholder="Enter code" id="code" required>
+    <label for="password">New password</label>
+    <input type="password" name="password" placeholder="Enter new password" id="password" required>
+    <label for="password2">Confirm password</label>
+    <input type="password" name="password2" placeholder="Confirm new password" id="password2" required>
+    <button class="btn" type="submit">Reset password</button>
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+</form>
+<div class="auth-link">
+    <p>Remember your password? <a href="{% url 'login' %}">Sign in</a></p>
+</div>
+{% endblock %}

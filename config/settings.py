@@ -136,3 +136,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'abujannn11@gmail.com'
 EMAIL_HOST_PASSWORD = 'qhql xkkz pzdn txxh'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+LOGIN_REDIRECT_URL = "redirect_dashboard"

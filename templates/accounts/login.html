@@ -1,0 +1,22 @@
+{% extends "accounts/base.html" %}
+{% block main %}
+<form action="" method="post">
+    {% csrf_token %}
+    <h2>Login</h2>
+    <label for="username">username</label>
+    <input type="text" placeholder="Enter your username" name="username" id="username">
+    
+    <label for="password">password</label>
+    <input type="password" placeholder="Enter your password" name="password" id="password">
+    
+    <button type="submit">Login</button>
+    {% if error %}
+        <p>{{error}}</p>
+    {% endif %}
+</form>
+<div class="auth-link">
+    <p>Need an account? <a href="{% url 'register' %}">Sign up</a></p>
+    <p>Have a code? <a href="{% url 'confirm' %}">Confirm email</a></p>
+    <p>Forget your password <a href="{% url 'forget_password' %}">Reset Password</a></p>
+</div>
+{% endblock %}
