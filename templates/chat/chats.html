@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Chat</title>
+    <style>
+        img {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Global Chat</h1>
+
+    {% for i in messages %}
+        <div>
+            <img src="{{ profile.photo.url }}" alt="">
+
+            <b>{{ i.user.username }}</b>
+
+            <p>{{ i.text }}</p>
+
+            <p>❤️ {{ i.likes }}</p>
+            <p>{{i.dizlikes}}</p>
+
+            <a href="{% url 'like' i.id %}"><img src="../../media/like.png" alt=""></a>
+            <a href="{% url 'dizlike' i.id %}"><img src="../../media/dizlike.png" alt=""></a>
+
+            <a href="{% url 'delete_message' i.id %}"><img src="../../media/delete.png" alt=""></a>
+        </div>
+
+        <hr>
+    {% empty %}
+        <p>No messages yet</p>
+    {% endfor %}
+
+    <form method="post">
+        {% csrf_token %}
+        <input  type="text" name="text" placeholder="Write message...">
+        <button type="submit">Send</button>
+    </form>
+
+</body>
+</html>

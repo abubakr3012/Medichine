@@ -6,6 +6,8 @@ class Message(models.Model):
     text=models.TextField()
     writed_at=models.DateTimeField(auto_now_add=True)
     likes=models.IntegerField(default=0)
+    dizlikes=models.IntegerField(default=0)
+
 
     def __str__(self):
         return f'{self.user.username}:{self.text[:20]}'
