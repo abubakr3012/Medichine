@@ -138,3 +138,5 @@ EMAIL_HOST_PASSWORD = 'qhql xkkz pzdn txxh'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 LOGIN_REDIRECT_URL = "redirect_dashboard"
+
+AUTH_USER_MODEL = 'accounts.User'
