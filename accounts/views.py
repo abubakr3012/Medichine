@@ -34,15 +34,18 @@ def register(request):
         password=request.POST['password']
         password2=request.POST['password2']
         email=request.POST['email']
+        phone=request.POST['phone']
 
         if password!=password2:
             return render(request,'accounts/register.html',{"error":'passwords are not match'})
+        if User.objects.filter(phone=phone).exists():
+            return render(request, 'accounts/register.html', {'error': 'This phone is already used'})
         elif User.objects.filter(username=username).exists():
             return render(request,'accounts/register.html',{'error':'this username is already taken'})
         elif User.objects.filter(email=email).exists():
             return render(request,'accounts/register.html',{'error':'this email is already taken'})
 
-        user=User.objects.create_user(username=username,email=email,password=password)
+        user=User.objects.create_user(username=username,email=email,password=password,phone=phone)
 
         user.is_active=False
         user.save()
