@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="" method="get">
+        {% csrf_token %}
+        <input type="text" placeholder="Search..." name="q">
+        <button type="submit">Search</button>
+    </form>
+    <a href="{% url 'redirect_dashboard' %}">home</a>
+    <a href="{% url 'doctors_list' %}">All doctors</a><br>
+    {% for i in doctors %}
+        {% if i.photo %}
+            <img src="{{i.photo.url}}" alt="">
+        {% else %}
+            <img src="../../media/user.png" alt="">
+        {% endif %}
+        <h1>user:{{i.user}}</h1>
+        <p>speciality:{{i.speciality}}</p>
+        <p>city:{{i.city}}</p>
+        <p>clinic:{{i.clinic}}</p>
+        <p>bio:{{i.bio}}</p>
+        <p>experience:{{i.experience}}</p><br><hr>
+    {% endfor %}
+    
+</body>
+</html>

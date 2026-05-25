@@ -3,16 +3,15 @@ from .models import DoctorProfile
 from django.db.models import Q,Max,Count
 
 def show_all_doctors(request):
-    profile=DoctorProfile.objects.select_related('user')
+    profile=DoctorProfile.objects.select_related('user').filter(user__role='doctor')
     q=request.GET.get('q','').strip()
     if q:
-        profile=profile.filter(
-            Q(user__name__icontains=q)|
-            Q(speciality__icontains=q)|
+        profile = profile.filter(
+            Q(user__username__icontains=q) |
+            Q(speciality__icontains=q) |
             Q(city__icontains=q)
         )
     stats=profile.aggregate(
-        all_patients=Count('id'),
-        more_patients=Max('user')
+        all_patients=Count('id')
     )
-    return render(request,'doctors/doctors.html',{"Doctors":profile,"stats":stats})
+    return render(request,'doctors/doctors.html',{"doctors":profile,"stats":stats})
