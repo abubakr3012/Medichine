@@ -8,7 +8,7 @@ def create_appointment(request,pk):
         Appointment.objects.create(
             patient=request.user,
             doctor=doctor,
-            date=request.GET['date']
+            date=request.POST.get('date')
         )
         return redirect('doctors_list')
     return render(request,'appoinments/appoinments.html',{"doctor":doctor})
