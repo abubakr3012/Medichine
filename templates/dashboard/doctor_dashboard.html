@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr {{user.username}}</title>
-</head>
-<body>
-    <h1>Doctor Panel</h1>
-    <a href="{% url 'login' %}">Logout</a>
-    <a href="{% url 'my_profile' %}">My profile</a>
-    <a href="{% url 'global_chat' %}">Советы</a>
-    <a href="{% url 'doctors_list' %}">Список врачов</a>
-</body>
-</html>
+{% extends "accounts/base.html" %}
+{% block title %}Панель врача — {{ user.username }}{% endblock %}
+{% block main %}
+<div class="dashboard-hero">
+    <h1>Панель врача</h1>
+    <h2>Dr. {{ user.username }}</h2>
+</div>
+<p class="muted">Используйте меню слева для навигации по разделам.</p>
+{% endblock %}

@@ -1,4 +1,6 @@
 {% extends "accounts/base.html" %}
+{% block body_class %}auth-page{% endblock %}
+{% block title %}Вход{% endblock %}
 {% block main %}
 <form action="" method="post">
     {% csrf_token %}

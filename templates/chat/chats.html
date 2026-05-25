@@ -1,53 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Chat</title>
-    <style>
-        img {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-        }
-    </style>
-</head>
-<body>
+{% extends "accounts/base.html" %}
+{% load static %}
+{% block title %}Советы — чат{% endblock %}
+{% block main %}
+<h1>Советы</h1>
+<p class="muted">Советы и обсуждения</p>
 
-    <h1>Global Chat</h1>
-        <a href="{% url 'redirect_dashboard' %}">Home</a>
-
+<ul class="chat-list">
     {% for i in messages %}
-        <div>
+        <li class="chat-message">
             {% if i.user.profile.photo %}
-                <img src="{{ i.user.profile.photo.url }}">
+                <img class="avatar" src="{{ i.user.profile.photo.url }}" alt="">
             {% endif %}
-            <a href="{% url 'profile' i.user.username %}">
-                <b>{{ i.user.username }}</b>
-            </a>
+            <div class="meta">
+                <a href="{% url 'profile' i.user.username %}"><b>{{ i.user.username }}</b></a>
+            </div>
             <p>{{ i.text }}</p>
-
-            <p>❤️{{i.likes.count}}</p>
-            <p>{{i.dizlikes.count}}</p>
-
-            <a href="{% url 'like' i.id %}"><img src="../../media/like.png" alt=""></a>
-            <a href="{% url 'dizlike' i.id %}"><img src="../../media/dizlike.png" alt=""></a>
-            {% if request.user == i.user %}
-            
-                <a href="{% url 'delete_message' i.id %}"><img src="../../media/delete.png" alt=""></a>
-            {% endif %}
-        </div>
-
-        <hr>
+            <p class="likes">❤️ {{ i.likes.count }} · 👎 {{ i.dizlikes.count }}</p>
+            <div class="chat-actions">
+                <a href="{% url 'like' i.id %}"><img src="/media/like.png" alt="Лайк"></a>
+                <a href="{% url 'dizlike' i.id %}"><img src="/media/dizlike.png" alt="Дизлайк"></a>
+                {% if request.user == i.user %}
+                    <a href="{% url 'delete_message' i.id %}"><img src="/media/delete.png" alt="Удалить"></a>
+                {% endif %}
+            </div>
+        </li>
     {% empty %}
-        <p>No messages yet</p>
+        <p class="muted">Пока нет сообщений</p>
     {% endfor %}
+</ul>
 
-    <form method="post">
-        {% csrf_token %}
-        <input  type="text" name="text" placeholder="Write message...">
-        <button type="submit">Send</button>
-    </form>
-
-</body>
-</html>
+<form class="chat-form chat-form-inline" method="post">
+    {% csrf_token %}
+    <input class="chat-input" type="text" name="text" placeholder="Написать сообщение...">
+    <button class="chat-send" type="submit">Отправить</button>
+</form>
+{% endblock %}

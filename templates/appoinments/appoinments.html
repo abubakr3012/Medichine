@@ -1,15 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <form action="" method="post">
-        {% csrf_token %}
-        <input type="datetime-local" name="date" placeholder="DD-MM-YYYY HH:MM" required>
-        <button type="submit">Записаться</button>
-    </form>
-</body>
-</html>
+{% extends "accounts/base.html" %}
+{% block title %}Запись к врачу{% endblock %}
+{% block main %}
+<h1>Запись на приём</h1>
+<form class="panel" action="" method="post">
+    {% csrf_token %}
+    <label for="date">Дата и время</label>
+    <input id="date" type="datetime-local" name="date" required>
+    <button type="submit">Записаться</button>
+</form>
+{% endblock %}

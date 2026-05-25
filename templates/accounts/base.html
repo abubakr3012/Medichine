@@ -1,25 +1,35 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        {% if profile.role == Doctor %}
-            {{profile.user.username}}
-        {% else %}
-            {{profile.user.username}}
-        {% endif %}
-    </title>
+    <title>{% block title %}Medicine{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
-    <main class="auth-page">
-        <section class="auth-panel">
-            <a href="{% url 'global_chat' %}">Советы</a>
-            {% block main %}
-            {% endblock %}
-        </section>
-    </main>
+<body class="{% block body_class %}{% endblock %}">
+    <div class="site-layout">
+        <nav class="site-nav" aria-label="Навигация">
+            <a class="site-brand" href="{% url 'redirect_dashboard' %}">Medicine</a>
+            <ul class="nav-list">
+                {% block nav %}
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'redirect_dashboard' %}">Главная</a></li>
+                    <li><a href="{% url 'my_profile' %}">Мой профиль</a></li>
+                    <li><a href="{% url 'global_chat' %}">Советы</a></li>
+                    <li><a href="{% url 'doctors_list' %}">Список врачей</a></li>
+                    <li><a href="{% url 'logout' %}">Выход</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Вход</a></li>
+                    <li><a href="{% url 'register' %}">Регистрация</a></li>
+                    <li><a href="{% url 'global_chat' %}">Советы</a></li>
+                {% endif %}
+                {% endblock %}
+            </ul>
+        </nav>
+        <main class="site-content">
+            {% block main %}{% endblock %}
+        </main>
+    </div>
 </body>
 </html>

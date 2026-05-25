@@ -1,32 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <form action="" method="get">
-        {% csrf_token %}
-        <input type="text" placeholder="Search..." name="q">
-        <button type="submit">Search</button>
-    </form>
-    <a href="{% url 'redirect_dashboard' %}">home</a>
-    <a href="{% url 'doctors_list' %}">All doctors</a><br>
-    {% for i in doctors %}
+{% extends "accounts/base.html" %}
+{% block title %}Список врачей{% endblock %}
+{% block main %}
+<h1>Список врачей</h1>
+
+<form class="search-bar panel" action="" method="get">
+    {% csrf_token %}
+    <input type="text" placeholder="Поиск..." name="q">
+    <button type="submit">Найти</button>
+</form>
+
+{% for i in doctors %}
+    <article class="doctor-card panel">
         {% if i.photo %}
-            <img src="{{i.photo.url}}" alt="">
+            <img src="{{ i.photo.url }}" alt="">
         {% else %}
-            <img src="../../media/user.png" alt="">
+            <img src="/media/user.png" alt="">
         {% endif %}
-        <h1>user:{{i.user}}</h1>
-        <p>speciality:{{i.speciality}}</p>
-        <p>city:{{i.city}}</p>
-        <p>clinic:{{i.clinic}}</p>
-        <p>bio:{{i.bio}}</p>
-        <p>experience:{{i.experience}}</p>
-        <a href="{% url 'create_appointment' i.id %}">Записаться</a><br><hr>
-    {% endfor %}
-    
-</body>
-</html>
+        <h3>{{ i.user }}</h3>
+        <p><strong>Специальность:</strong> {{ i.speciality }}</p>
+        <p><strong>Город:</strong> {{ i.city }}</p>
+        <p><strong>Клиника:</strong> {{ i.clinic }}</p>
+        <p><strong>О себе:</strong> {{ i.bio }}</p>
+        <p><strong>Опыт:</strong> {{ i.experience }} лет</p>
+        <a class="book-link button" href="{% url 'create_appointment' i.id %}">Записаться</a>
+    </article>
+{% empty %}
+    <p class="muted">Врачи не найдены</p>
+{% endfor %}
+{% endblock %}

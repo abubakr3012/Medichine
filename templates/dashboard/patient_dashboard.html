@@ -1,35 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document
-    </title>
-</head>
-<body>
-    <h1>Welcome {{user.username}}</h1>
-    <h2>Patient Dashboard</h2>
-    <a href="{% url 'login' %}">Logout</a>
-    <a href="{% url 'my_profile' %}">My profile</a>
-    <a href="{% url 'global_chat' %}">Советы</a>
-    <a href="{% url 'doctors_list' %}">Список врачов</a>
-    
+{% extends "accounts/base.html" %}
+{% block title %}Панель пациента — {{ user.username }}{% endblock %}
+{% block main %}
+<div class="dashboard-hero">
+    <h1>Добро пожаловать, {{ user.username }}</h1>
+    <h2>Панель пациента</h2>
+</div>
+
+<section class="panel ai-box">
+    <h3>Спросить ИИ о симптомах</h3>
     {% if answer %}
-        <p>{{ answer }}</p>
+        <div class="ai-answer">
+            <p>{{ answer }}</p>
+        </div>
     {% endif %}
     <form method="post">
         {% csrf_token %}
-        
-        <input
-            type="text"
-            name="symptom"
-            placeholder="What hurts?"
-        >
-        
-        <button type="submit">
-            Ask AI
-        </button>
+        <input type="text" name="symptom" placeholder="Что беспокоит?">
+        <button type="submit">Спросить ИИ</button>
     </form>
-    
-</body>
-</html>
+</section>
+{% endblock %}
