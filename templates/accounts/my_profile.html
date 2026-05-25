@@ -1,0 +1,43 @@
+{% extends "accounts/base.html" %}
+{% block main %}
+<main class="page">
+    <header class="page-head">
+        <div>
+            <p class="eyebrow">Account</p>
+            <h1>My profile</h1>
+        </div>
+        <a class="button" href="{% url 'update_profile' profile.id %}">Edit profile</a>
+    </header>
+    <section class="profile-card panel">
+        <div class="profile-avatar">
+            {% if profile.photo %}
+                <img src="{{ profile.photo.url }}" alt="Profile photo">
+            {% else %}
+                <img src="/media/user.png" alt="Default avatar">
+            {% endif %}
+        </div>
+        <dl class="profile-details">
+            <div>
+                <dt>Username</dt>
+                <dd>{{ profile.user.username }}</dd>
+            </div>
+            <div>
+                <dt>Email</dt>
+                <dd>{{ profile.user.email }}</dd>
+            </div>
+            <div>
+                <dt>Phone</dt>
+                <dd>{{ profile.phone|default:"—" }}</dd>
+            </div>
+            <div>
+                <dt>Age</dt>
+                <dd>{{ profile.age|default:"—" }}</dd>
+            </div>
+            <div>
+                <dt>Role</dt>
+                <dd><span class="badge badge-{{ profile.role }}">{{ profile.get_role_display }}</span></dd>
+            </div>
+        </dl>
+    </section>
+</main>
+{% endblock %}

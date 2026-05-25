@@ -1,11 +1,11 @@
 
 from django.contrib.auth.decorators import login_required,permission_required
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth import login,logout,authenticate
 from random import randint
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import EmailConfirm,ResetPassword
+from .models import EmailConfirm,ResetPassword,User,Profile
 from django.contrib.auth import get_user_model
 
 User=get_user_model()
@@ -46,7 +46,7 @@ def register(request):
         elif User.objects.filter(email=email).exists():
             return render(request,'accounts/register.html',{'error':'this email is already taken'})
 
-        user=User.objects.create_user(username=username,email=email,password=password,phone=phone, role='patient',age=age)
+        user=User.objects.create_user(username=username,email=email,password=password,phone=phone, role='patient',age=age)  
 
         user.is_active=False
         user.save()
@@ -207,3 +207,32 @@ def admin_dashboard(request):
             'user': request.user
         }
     )
+
+@login_required(login_url="/login/")
+def profile(request):
+    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    return render(request, "accounts/my_profile.html", {
+        "profile": profile
+    })
+
+@login_required(login_url='/login/')
+def update_profile(request,pk):
+    profile=get_object_or_404(Profile,pk=pk)
+    if request.method=="POST":
+        profile.user.username=request.POST['username']
+        profile.user.email=request.POST['email']
+
+        profile.user.save()
+
+        profile.phone=request.POST['phone']
+        profile.age=request.POST['age']
+
+        if request.FILES.get('photo'):
+            
+            profile.photo=request.FILES.get('photo')
+    
+        profile.save()
+        return redirect('my_profile')
+    return render(request,'accounts/update_profile.html',{"profile":profile})
+
