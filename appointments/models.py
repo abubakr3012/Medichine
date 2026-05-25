@@ -6,7 +6,7 @@ User=settings.AUTH_USER_MODEL
 class Appointment(models.Model):
     patient = models.ForeignKey(User,on_delete=models.CASCADE,related_name='appointments')
     doctor=models.ForeignKey('doctors.DoctorProfile',on_delete=models.CASCADE,related_name='appointments')
-    date=models.DateTimeField(auto_now_add=True)
+    date=models.DateTimeField()
 
     STATUS = (
         ('pending', 'Ожидание'),
@@ -18,4 +18,4 @@ class Appointment(models.Model):
     created_at=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.patient.username}:{self.doctor.username}'
+        return f'{self.patient.username}:{self.doctor.user.username}'

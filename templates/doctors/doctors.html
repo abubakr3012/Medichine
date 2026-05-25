@@ -24,7 +24,8 @@
         <p>city:{{i.city}}</p>
         <p>clinic:{{i.clinic}}</p>
         <p>bio:{{i.bio}}</p>
-        <p>experience:{{i.experience}}</p><br><hr>
+        <p>experience:{{i.experience}}</p>
+        <a href="{% url 'create_appointment' i.id %}">Записаться</a><br><hr>
     {% endfor %}
     
 </body>
