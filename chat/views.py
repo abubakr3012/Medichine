@@ -50,3 +50,4 @@ def delete_message(request,pk):
 def profile_view(request,username):
     profile=get_object_or_404(User,username=username)
     return render(request,'accounts/profile.html',{'profile':profile})
+

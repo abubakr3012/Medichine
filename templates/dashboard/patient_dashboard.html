@@ -12,6 +12,22 @@
     <a href="{% url 'login' %}">Logout</a>
     <a href="{% url 'my_profile' %}">My profile</a>
     <a href="{% url 'global_chat' %}">Советы</a>
-
+    <form method="post">
+        {% csrf_token %}
+        
+        <input
+            type="text"
+            name="symptom"
+            placeholder="What hurts?"
+        >
+        
+        <button type="submit">
+            Ask AI
+        </button>
+    </form>
+    
+    {% if answer %}
+        <p>{{ answer }}</p>
+    {% endif %}
 </body>
 </html>

@@ -7,7 +7,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .models import EmailConfirm,ResetPassword,User,Profile
 from django.contrib.auth import get_user_model
-
+from ai.ai import ask_ai
 User=get_user_model()
 
 
@@ -176,15 +176,21 @@ def redirect_dashboard(request):
 
 @login_required
 def patient_dashboard(request):
+    answer = ""
+
+    if request.method == "POST":
+        symptom = request.POST.get("symptom")
+
+        if symptom:
+            answer = ask_ai(symptom)
 
     return render(
         request,
         'dashboard/patient_dashboard.html',
         {
-            'user': request.user
+            "answer": answer
         }
     )
-
 
 @login_required
 def doctor_dashboard(request):
