@@ -1,6 +1,10 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import Message
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+
+
+User=get_user_model()
 
 @login_required(login_url='/login/')
 def chat_page(request):
@@ -23,7 +27,8 @@ def like(request,pk):
     ms=get_object_or_404(Message,pk=pk)
     if request.user not in ms.likes.all():
         ms.likes.add(request.user)
-
+    else:
+        ms.likes.remove(request.user)
     return redirect('global_chat')
 
 @login_required(login_url='/login/')
@@ -31,6 +36,8 @@ def dizlike(request,pk):
     ms=Message.objects.get(pk=pk)
     if request.user not in ms.dizlikes.all():
         ms.dizlikes.add(request.user)
+    else:
+        ms.dizlikes.remove(request.user)
     return redirect('global_chat')
 
 @login_required(login_url='/login/')
@@ -39,3 +46,7 @@ def delete_message(request,pk):
     if request.user==ms.user:
         ms.delete()
     return redirect('global_chat')
+
+def profile_view(request,username):
+    profile=get_object_or_404(User,username=username)
+    return render(request,'accounts/profile.html',{'profile':profile})

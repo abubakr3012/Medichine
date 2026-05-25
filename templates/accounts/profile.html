@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile {{ profile.username }}</title>
+</head>
+<body>
+
+    <h1>{{ profile.username }}</h1>
+    <dd><span class="badge badge-{{ profile.role }}">{{ profile.get_role_display }}</span></dd>
+
+    {% if profile.profile.photo %}
+        <img src="{{ profile.profile.photo.url }}" width="100">
+    {% endif %}
+        <a href="{% url 'redirect_dashboard' %}">Home</a>
+
+</body>
+</html>

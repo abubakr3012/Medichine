@@ -8,19 +8,23 @@
         img {
             width: 20px;
             height: 20px;
+            border-radius: 50%;
         }
     </style>
 </head>
 <body>
 
     <h1>Global Chat</h1>
+        <a href="{% url 'redirect_dashboard' %}">Home</a>
 
     {% for i in messages %}
         <div>
-            <img src="{{ profile.photo.url }}" alt="">
-
-            <b>{{ i.user.username }}</b>
-
+            {% if i.user.profile.photo %}
+                <img src="{{ i.user.profile.photo.url }}">
+            {% endif %}
+            <a href="{% url 'profile' i.user.username %}">
+                <b>{{ i.user.username }}</b>
+            </a>
             <p>{{ i.text }}</p>
 
             <p>❤️{{i.likes.count}}</p>
@@ -28,8 +32,10 @@
 
             <a href="{% url 'like' i.id %}"><img src="../../media/like.png" alt=""></a>
             <a href="{% url 'dizlike' i.id %}"><img src="../../media/dizlike.png" alt=""></a>
-
-            <a href="{% url 'delete_message' i.id %}"><img src="../../media/delete.png" alt=""></a>
+            {% if request.user == i.user %}
+            
+                <a href="{% url 'delete_message' i.id %}"><img src="../../media/delete.png" alt=""></a>
+            {% endif %}
         </div>
 
         <hr>
