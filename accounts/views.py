@@ -8,7 +8,7 @@ from django.conf import settings
 from .models import EmailConfirm,ResetPassword
 
 def send_confirmation_email(user):
-    code=randint(10000,99999)
+    code=randint(100000,999999)
     EmailConfirm.objects.update_or_create(user=user,defaults={"code":code})
 
     try:
@@ -92,7 +92,7 @@ def confirm_email(request):
         return render(request,'accounts/confirmation.html')
     
 def send_reset_code(user):
-    code=randint(10000,99999)
+    code=randint(100000,999999)
     ResetPassword.objects.update_or_create(
         user=user,
         defaults={'code':code}
