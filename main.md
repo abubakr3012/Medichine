@@ -33,3 +33,5 @@ telemed/
 ├── templates/
 ├── manage.py
 └── requirements.txt
+
+https://github.com/abubakr3012/Medichine.git
