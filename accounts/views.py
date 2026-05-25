@@ -69,7 +69,7 @@ def login_user(request):
                 return render(request,'accounts/login.html',{'error':'username or password is wrong'})
         else:
             login(request,user)
-            return redirect('/redirect_dashboard/')
+            return redirect('/dashboard/')
     else:
         return render(request,'accounts/login.html')
 
