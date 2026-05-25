@@ -4,7 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medichine</title>
+    <title>
+        {% if profile.role == Doctor %}
+            {{profile.user.username}}
+        {% else %}
+            {{profile.user.username}}
+        {% endif %}
+    </title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
