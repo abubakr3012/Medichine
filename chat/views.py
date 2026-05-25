@@ -20,17 +20,17 @@ def chat_page(request):
 
 @login_required(login_url='/login/')
 def like(request,pk):
-    ms=Message.objects.get(pk=pk)
-    ms.likes+=1
-    ms.save()
+    ms=get_object_or_404(Message,pk=pk)
+    if request.user not in ms.likes.all():
+        ms.likes.add(request.user)
 
     return redirect('global_chat')
 
 @login_required(login_url='/login/')
 def dizlike(request,pk):
     ms=Message.objects.get(pk=pk)
-    ms.dizlikes+=1
-    ms.save()
+    if request.user not in ms.dizlikes.all():
+        ms.dizlikes.add(request.user)
     return redirect('global_chat')
 
 @login_required(login_url='/login/')

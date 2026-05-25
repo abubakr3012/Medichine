@@ -5,9 +5,8 @@ class Message(models.Model):
     user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     text=models.TextField()
     writed_at=models.DateTimeField(auto_now_add=True)
-    likes=models.IntegerField(default=0)
-    dizlikes=models.IntegerField(default=0)
-
+    likes=models.ManyToManyField(settings.AUTH_USER_MODEL,related_name='liked_messages',blank=True)
+    dizlikes=models.ManyToManyField(settings.AUTH_USER_MODEL,related_name='dizliked_messages',blank=True)
 
     def __str__(self):
         return f'{self.user.username}:{self.text[:20]}'

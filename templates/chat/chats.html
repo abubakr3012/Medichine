@@ -23,8 +23,8 @@
 
             <p>{{ i.text }}</p>
 
-            <p>❤️ {{ i.likes }}</p>
-            <p>{{i.dizlikes}}</p>
+            <p>❤️{{i.likes.count}}</p>
+            <p>{{i.dizlikes.count}}</p>
 
             <a href="{% url 'like' i.id %}"><img src="../../media/like.png" alt=""></a>
             <a href="{% url 'dizlike' i.id %}"><img src="../../media/dizlike.png" alt=""></a>
