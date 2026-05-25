@@ -12,6 +12,10 @@
     <a href="{% url 'login' %}">Logout</a>
     <a href="{% url 'my_profile' %}">My profile</a>
     <a href="{% url 'global_chat' %}">Советы</a>
+    
+    {% if answer %}
+        <p>{{ answer }}</p>
+    {% endif %}
     <form method="post">
         {% csrf_token %}
         
@@ -26,8 +30,5 @@
         </button>
     </form>
     
-    {% if answer %}
-        <p>{{ answer }}</p>
-    {% endif %}
 </body>
 </html>
