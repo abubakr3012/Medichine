@@ -1,26 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send message Dr {{profile.username}}</title>
-</head>
-<body>
+{% extends "accounts/base.html" %}
+{% block title %}Чат с {{ profile.username }}{% endblock %}
+{% block main %}
+<h1>Чат с {{ profile.username }}</h1>
+
+<ul class="chat-list">
     {% for i in messages %}
-        <b>{{ i.sender.username }}</b>
-        <p>{{i.text}}</p>
-        {% if i.is_readed %}
-            <p>readed</p>
-        {% else %}
-            <p>Not readed</p>
-        {% endif %}
+        <li class="chat-message">
+            <div class="meta">
+                <b>{{ i.sender.username }}</b>
+            </div>
+            <p>{{ i.text }}</p>
+            {% if i.is_readed %}
+                <p class="muted">Прочитано</p>
+            {% else %}
+                <p class="muted">Не прочитано</p>
+            {% endif %}
+        </li>
     {% empty %}
-        <p>Сообщение нет</p>
+        <p class="muted">Сообщений нет</p>
     {% endfor %}
-    <form action="" method="post">
-        {% csrf_token %}
-        <input type="text" placeholder="Напишите сообщение..." name="text">
-        <button type="submit">Отправить</button>
-    </form>
-</body>
-</html>
+</ul>
+
+<form class="chat-form chat-form-inline" action="" method="post">
+    {% csrf_token %}
+    <input class="chat-input" type="text" placeholder="Напишите сообщение..." name="text">
+    <button class="chat-send" type="submit">Отправить</button>
+</form>
+{% endblock %}
