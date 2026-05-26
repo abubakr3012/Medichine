@@ -24,6 +24,8 @@
             </div>
             <div class="dm-action">
                 <a class="button" href="{% url 'send_message' i.id %}">Открыть чат</a>
+
+                <a href="{% url 'delete_chat' i.id %}">Удалить чат</a>
             </div>
         </div>
     {% empty %}

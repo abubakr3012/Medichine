@@ -9,4 +9,5 @@ urlpatterns = [
     path('delete_message/<int:pk>',views.delete_message,name='delete_message'),
     path('send_message/<int:pk>',views.send_message,name='send_message'),
     path('doctor_messages/',views.show_messages,name='show_messages'),
+    path('delete_chat/<int:pk>',views.delete_chat,name='delete_chat')
 ]   

@@ -80,3 +80,14 @@ def show_messages(request):
         Q(received_messages__sender=user)
     ).distinct()
     return render(request,'chat/show_messages.html',{"users":users})
+
+@login_required(login_url='login')
+def delete_chat(request, pk):
+    other_user = get_object_or_404(User, pk=pk)
+
+    Direct.objects.filter(
+        Q(sender=request.user, receiner=other_user) |
+        Q(sender=other_user, receiner=request.user)
+    ).delete()
+
+    return redirect('show_messages')
