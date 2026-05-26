@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages Dr {{profile.username}}</title>
+</head>
+<body>
+    <h2>Chat with {{ profile.username }}</h2>
+
+{% for i in messages %}
+    {% if i.sender == request.user %}
+        <p style="text-align:right; color:blue;">
+            Me: {{ i.text }}
+        </p>
+    {% else %}
+        <p style="text-align:left;">
+            {{ i.sender.username }}: {{ i.text }}
+        </p>
+    {% endif %}
+{% empty %}
+    <p>Сообщений нет</p>
+{% endfor %}
+
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="text" placeholder="Напишите сообщение...">
+    <button type="submit">Отправить</button>
+</form>
+</body>
+</html>

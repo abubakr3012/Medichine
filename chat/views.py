@@ -67,3 +67,9 @@ def send_message(request,pk):
         Q(sender=ptn, receiner=request.user)
     ).order_by("created_at")
     return render(request,'chat/send_message.html',{"messages":message,"profile":ptn})
+
+@login_required(login_url='login')
+def show_messages(request):
+    user=request.user
+    messages=Direct.objects.filter(Q(sender=user)|Q(receiner=user)).order_by("created_at")
+    return render(request,'chat/show_messages.html',{"messages":messages})

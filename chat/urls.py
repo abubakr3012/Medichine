@@ -8,4 +8,5 @@ urlpatterns = [
     path('profile/<str:username>/', views.profile_view, name='profile'),
     path('delete_message/<int:pk>',views.delete_message,name='delete_message'),
     path('send_message/<int:pk>',views.send_message,name='send_message'),
+    path('doctor_messages/',views.show_messages,name='show_messages'),
 ]   
