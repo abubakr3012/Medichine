@@ -9,6 +9,11 @@
     {% for i in messages %}
         <b>{{ i.sender.username }}</b>
         <p>{{i.text}}</p>
+        {% if i.is_readed %}
+            <p>readed</p>
+        {% else %}
+            <p>Not readed</p>
+        {% endif %}
     {% empty %}
         <p>Сообщение нет</p>
     {% endfor %}

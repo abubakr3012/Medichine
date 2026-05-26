@@ -61,14 +61,9 @@ def send_message(request,pk):
             text=request.POST.get("text")
         )
         return redirect('send_message',ptn.pk)
-    return render(request,'chat/send_message.html',{"receiver":ptn})
-    
-@login_required(login_url='login')
-def chat(request,pk):
-    ptn=get_object_or_404(User,pk=pk)
 
     message=Direct.objects.filter(
-        Q(sender=request.user,receiner=ptn)|
-        Q(sender=ptn,receiner=request.user)
+        Q(sender=request.user, receiner=ptn) |
+        Q(sender=ptn, receiner=request.user)
     ).order_by("created_at")
-    return render(request,'chat/send_message.html',{"messages":message})
+    return render(request,'chat/send_message.html',{"messages":message,"profile":ptn})
