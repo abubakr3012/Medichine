@@ -7,7 +7,24 @@
 <section class="panel dm-list">
     {% for i in users %}
         <div class="dm-item">
-            <a href="{% url 'send_message' i.id %}">{{ i.username }}</a>
+            <div class="dm-avatar">
+                {% if i.profile.photo %}
+                    <img src="{{ i.profile.photo.url }}" alt="">
+                {% else %}
+                    <img src="/media/user.png" alt="">
+                {% endif %}
+            </div>
+            <div class="dm-meta">
+                <div class="dm-name">
+                    <a href="{% url 'send_message' i.id %}">{{ i.username }}</a>
+                </div>
+                <div class="dm-sub">
+                    <span class="badge badge-{{ i.profile.role }}">{{ i.profile.get_role_display }}</span>
+                </div>
+            </div>
+            <div class="dm-action">
+                <a class="button" href="{% url 'send_message' i.id %}">Открыть чат</a>
+            </div>
         </div>
     {% empty %}
         <p class="muted">Сообщений нет</p>
