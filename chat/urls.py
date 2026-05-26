@@ -7,4 +7,5 @@ urlpatterns = [
     path('dizlike/<int:pk>',views.dizlike,name='dizlike'),
     path('profile/<str:username>/', views.profile_view, name='profile'),
     path('delete_message/<int:pk>',views.delete_message,name='delete_message'),
+    path('send_message/<int:pk>',views.send_message,name='send_message'),
 ]   
