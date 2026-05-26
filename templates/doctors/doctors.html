@@ -23,7 +23,7 @@
         <p><strong>О себе:</strong> {{ i.bio }}</p>
         <p><strong>Опыт:</strong> {{ i.experience }} лет</p>
         <a class="book-link button" href="{% url 'create_appointment' i.id %}">Записаться</a>
-        <a href="{% url 'send_message' i.id %}">Написать</a>
+        <a href="{% url 'send_message' i.user.id %}">Написать</a>
     
 
     </article>

@@ -55,17 +55,20 @@ def profile_view(request,username):
 def send_message(request,pk):
     ptn=get_object_or_404(User,pk=pk)
     if request.method == 'POST':
-        Direct.objects.create(
-            sender=request.user,
-            receiner=ptn,
-            text=request.POST.get("text")
-        )
+        text = request.POST.get("text", "").strip()
+        if text:
+            Direct.objects.create(
+                sender=request.user,
+                receiner=ptn,
+                text=text
+            )
         return redirect('send_message',ptn.pk)
 
     message=Direct.objects.filter(
         Q(sender=request.user, receiner=ptn) |
         Q(sender=ptn, receiner=request.user)
     ).order_by("created_at")
+    message.filter(receiner=request.user, is_readed=False).update(is_readed=True)
     return render(request,'chat/send_message.html',{"messages":message,"profile":ptn})
 
 @login_required(login_url='login')
