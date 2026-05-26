@@ -8,16 +8,10 @@
 <body>
     <h2>Chat with {{ profile.username }}</h2>
 
-{% for i in messages %}
-    {% if i.sender == request.user %}
-        <p style="text-align:right; color:blue;">
-            Me: {{ i.text }}
-        </p>
-    {% else %}
-        <p style="text-align:left;">
-            {{ i.sender.username }}: {{ i.text }}
-        </p>
-    {% endif %}
+{% for i in users %}
+    <div class="block">
+        <a href="{% url 'send_message' i.id %}">{{i.username}}</a>
+    </div>
 {% empty %}
     <p>Сообщений нет</p>
 {% endfor %}

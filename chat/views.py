@@ -72,4 +72,8 @@ def send_message(request,pk):
 def show_messages(request):
     user=request.user
     messages=Direct.objects.filter(Q(sender=user)|Q(receiner=user)).order_by("created_at")
-    return render(request,'chat/show_messages.html',{"messages":messages})
+    users=User.objects.filter(
+        Q(send_messages__receiner=user)|
+        Q(received_messages__sender=user)
+    ).distinct()
+    return render(request,'chat/show_messages.html',{"users":users})
