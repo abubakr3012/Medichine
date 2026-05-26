@@ -3,18 +3,40 @@
 {% block main %}
 <h1>Чат с {{ profile.username }}</h1>
 
-<ul class="chat-list">
+<ul class="chat-list dm-messages">
     {% for i in messages %}
-        <li class="chat-message">
-            <div class="meta">
-                <b>{{ i.sender.username }}</b>
+        <li class="chat-message {% if i.sender == request.user %}msg-own{% else %}msg-other{% endif %}">
+            <div class="msg-avatar">
+                {% if i.sender.profile.photo %}
+                    <img src="{{ i.sender.profile.photo.url }}" alt="">
+                {% else %}
+                    <img src="/media/user.png" alt="">
+                {% endif %}
             </div>
-            <p>{{ i.text }}</p>
-            {% if i.is_readed %}
-                <p class="muted">Прочитано</p>
-            {% else %}
-                <p class="muted">Не прочитано</p>
-            {% endif %}
+
+            <div class="msg-body">
+                <div class="msg-meta">
+                    <b>
+                        {% if i.sender == request.user %}
+                            Вы
+                        {% else %}
+                            {{ i.sender.username }}
+                        {% endif %}
+                    </b>
+                </div>
+
+                <div class="msg-bubble">
+                    <p>{{ i.text }}</p>
+                </div>
+
+                <div class="msg-read">
+                    {% if i.is_readed %}
+                        Прочитано
+                    {% else %}
+                        Не прочитано
+                    {% endif %}
+                </div>
+            </div>
         </li>
     {% empty %}
         <p class="muted">Сообщений нет</p>
