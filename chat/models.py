@@ -22,5 +22,5 @@ class Direct(models.Model):
     is_readed=models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.sender.user.username}:{self.receiner.user.username}'
+        return f'{self.sender.username}:{self.receiner.username}'
     
