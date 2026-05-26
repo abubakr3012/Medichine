@@ -1,12 +1,13 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Message
+from .models import Message,Direct
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 
 
 User=get_user_model()
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def chat_page(request):
     if request.method=="POST":
         text=request.POST['text']
@@ -21,8 +22,7 @@ def chat_page(request):
 
     return render(request,'chat/chats.html',{"messages":messages})
 
-
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def like(request,pk):
     ms=get_object_or_404(Message,pk=pk)
     if request.user not in ms.likes.all():
@@ -31,7 +31,7 @@ def like(request,pk):
         ms.likes.remove(request.user)
     return redirect('global_chat')
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def dizlike(request,pk):
     ms=Message.objects.get(pk=pk)
     if request.user not in ms.dizlikes.all():
@@ -40,7 +40,7 @@ def dizlike(request,pk):
         ms.dizlikes.remove(request.user)
     return redirect('global_chat')
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def delete_message(request,pk):
     ms=get_object_or_404(Message,pk=pk)
     if request.user==ms.user:
@@ -51,3 +51,23 @@ def profile_view(request,username):
     profile=get_object_or_404(User,username=username)
     return render(request,'accounts/profile.html',{'profile':profile})
 
+@login_required(login_url='login')
+def send_message(request,pk):
+    ptn=get_object_or_404(User,pk=pk)
+    if request.method=='POST':
+        Direct.objects.create(
+            sender=request.user,
+            receiver=ptn,
+            text=request.POST.get("text")
+        )
+        return redirect('chat',ptn.pk)
+    
+@login_required(login_url='login')
+def chat(request,pk):
+    ptn=get_object_or_404(User,pk=pk)
+
+    message=Direct.objects.filter(
+        Q(sender=request.user,receiver=ptn)|
+        Q(sender=ptn,receiver=request.user)
+    ).order_by("created_at")
+    return render(request,'chat/send_message.html',{"messages":message})
