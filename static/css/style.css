@@ -630,6 +630,132 @@ button:active,
     max-width: 560px;
 }
 
+.account-page {
+    max-width: 980px;
+}
+
+.account-profile {
+    overflow: hidden;
+}
+
+.account-cover {
+    min-height: 190px;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    color: #ffffff;
+    background:
+        linear-gradient(135deg, rgba(16, 36, 47, 0.92), rgba(11, 143, 138, 0.82)),
+        radial-gradient(circle at 82% 20%, rgba(255, 255, 255, 0.28), transparent 13rem),
+        linear-gradient(120deg, rgba(240, 93, 94, 0.26), transparent 56%);
+}
+
+.account-cover .eyebrow {
+    display: inline-flex;
+    padding: 0.35rem 0.75rem;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+}
+
+.account-cover h1 {
+    max-width: 640px;
+    margin: 0.95rem 0 0;
+    color: #ffffff;
+}
+
+.account-body {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 1.45rem;
+    padding: 0 clamp(1.1rem, 2.6vw, 1.7rem) clamp(1.1rem, 2.6vw, 1.7rem);
+}
+
+.account-avatar {
+    margin-top: -68px;
+}
+
+.account-avatar img {
+    width: 170px;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 34px;
+    background: var(--primary-soft);
+    border: 6px solid #ffffff;
+    box-shadow: var(--shadow);
+}
+
+.account-info {
+    min-width: 0;
+    padding-top: 1.25rem;
+}
+
+.account-title {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.account-title h2 {
+    margin: 0 0 0.3rem;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+.account-title .muted {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.account-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin: 0 0 1.1rem;
+}
+
+.account-details div {
+    min-width: 0;
+    padding: 1rem;
+    background: var(--surface-soft);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+}
+
+.account-details dt {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 850;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.account-details dd {
+    margin: 0.28rem 0 0;
+    color: var(--text);
+    font-size: 1.02rem;
+    font-weight: 760;
+    overflow-wrap: anywhere;
+}
+
+.account-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.secondary-button {
+    color: var(--primary-dark);
+    background: #ffffff;
+    border-color: rgba(11, 143, 138, 0.24);
+    box-shadow: 0 10px 22px rgba(16, 36, 47, 0.08);
+}
+
+.secondary-button:hover {
+    color: var(--primary-dark);
+    background: var(--primary-soft);
+}
+
 .dashboard-hero {
     position: relative;
     margin-bottom: 1.45rem;
@@ -1053,6 +1179,32 @@ hr {
 
     .profile-details {
         grid-template-columns: 1fr;
+    }
+
+    .account-body,
+    .account-title,
+    .account-details {
+        display: block;
+    }
+
+    .account-cover {
+        min-height: 150px;
+    }
+
+    .account-avatar {
+        margin-top: -54px;
+        margin-bottom: 1rem;
+    }
+
+    .account-avatar img {
+        width: 126px;
+        height: 126px;
+        border-radius: 26px;
+    }
+
+    .account-title .badge,
+    .account-details div {
+        margin-top: 0.75rem;
     }
 
     .public-profile-body,

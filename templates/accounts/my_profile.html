@@ -1,43 +1,55 @@
 {% extends "accounts/base.html" %}
 {% block main %}
-<main class="page">
-    <header class="page-head">
-        <div>
-            <p class="eyebrow">Account</p>
-            <h1>My profile</h1>
+<main class="page account-page">
+    <section class="account-profile panel">
+        <div class="account-cover">
+            <span class="eyebrow">Личный кабинет</span>
+            <h1>Мой профиль</h1>
         </div>
-        <a class="button" href="{% url 'update_profile' profile.id %}">Редактировать</a>
-    </header>
-    <section class="profile-card panel">
-        <div class="profile-avatar">
+
+        <div class="account-body">
+            <div class="account-avatar">
             {% if profile.photo %}
                 <img src="{{ profile.photo.url }}" alt="Profile photo">
             {% else %}
                 <img src="/media/user.png" alt="Default avatar">
             {% endif %}
+            </div>
+
+            <div class="account-info">
+                <div class="account-title">
+                    <div>
+                        <h2>{{ profile.user.username }}</h2>
+                        <p class="muted">{{ profile.user.email|default:"Email не указан" }}</p>
+                    </div>
+                    <span class="badge badge-{{ profile.role }}">{{ profile.get_role_display }}</span>
+                </div>
+
+                <dl class="account-details">
+                    <div>
+                        <dt>Имя пользователя</dt>
+                        <dd>{{ profile.user.username }}</dd>
+                    </div>
+                    <div>
+                        <dt>Email</dt>
+                        <dd>{{ profile.user.email|default:"Не указан" }}</dd>
+                    </div>
+                    <div>
+                        <dt>Телефон</dt>
+                        <dd>{{ profile.phone|default:profile.user.phone|default:"Не указан" }}</dd>
+                    </div>
+                    <div>
+                        <dt>Возраст</dt>
+                        <dd>{{ profile.age|default:profile.user.age|default:"Не указан" }}</dd>
+                    </div>
+                </dl>
+
+                <div class="account-actions">
+                    <a class="button" href="{% url 'update_profile' profile.id %}">Редактировать профиль</a>
+                    <a class="button secondary-button" href="{% url 'show_messages' %}">Мои сообщения</a>
+                </div>
+            </div>
         </div>
-        <dl class="profile-details">
-            <div>
-                <dt>Username</dt>
-                <dd>{{ profile.user.username }}</dd>
-            </div>
-            <div>
-                <dt>Email</dt>
-                <dd>{{ profile.user.email }}</dd>
-            </div>
-            <div>
-                <dt>Phone</dt>
-                <dd>{{ profile.phone|default:"—" }}</dd>
-            </div>
-            <div>
-                <dt>Age</dt>
-                <dd>{{ profile.age|default:"—" }}</dd>
-            </div>
-            <div>
-                <dt>Role</dt>
-                <dd><span class="badge badge-{{ profile.role }}">{{ profile.get_role_display }}</span></dd>
-            </div>
-        </dl>
     </section>
 </main>
 {% endblock %}
