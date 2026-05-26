@@ -1,13 +1,48 @@
 {% extends "accounts/base.html" %}
 {% block title %}Профиль — {{ profile.username }}{% endblock %}
 {% block main %}
-<section class="profile-card panel">
-    <h1>{{ profile.username }}</h1>
-    <span class="badge badge-{{ profile.role }}">{{ profile.get_role_display }}</span>
-    {% if profile.profile.photo %}
-        <div class="profile-avatar">
+<section class="public-profile panel">
+    <div class="public-profile-cover">
+        <span class="eyebrow">Профиль пользователя</span>
+    </div>
+
+    <div class="public-profile-body">
+        <div class="public-profile-avatar">
+            {% if profile.profile.photo %}
             <img src="{{ profile.profile.photo.url }}" alt="Фото профиля">
+            {% else %}
+            <img src="/media/user.png" alt="Фото профиля">
+            {% endif %}
         </div>
-    {% endif %}
+
+        <div class="public-profile-main">
+            <div class="public-profile-title">
+                <div>
+                    <h1>{{ profile.username }}</h1>
+                    <p class="muted">{{ profile.email|default:"Email не указан" }}</p>
+                </div>
+                <span class="badge badge-{{ profile.role }}">{{ profile.get_role_display }}</span>
+            </div>
+
+            <div class="public-profile-stats">
+                <div>
+                    <span>Телефон</span>
+                    <strong>{{ profile.profile.phone|default:profile.phone|default:"Не указан" }}</strong>
+                </div>
+                <div>
+                    <span>Возраст</span>
+                    <strong>{{ profile.profile.age|default:profile.age|default:"Не указан" }}</strong>
+                </div>
+                <div>
+                    <span>Роль</span>
+                    <strong>{{ profile.get_role_display|default:"Пользователь" }}</strong>
+                </div>
+            </div>
+
+            {% if user.is_authenticated and user.id != profile.id %}
+                <a class="button" href="{% url 'send_message' profile.id %}">Написать сообщение</a>
+            {% endif %}
+        </div>
+    </div>
 </section>
 {% endblock %}
