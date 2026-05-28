@@ -11,20 +11,56 @@ from ai.ai import ask_ai
 User=get_user_model()
 
 
+def send_code_email(user, code, subject, heading, intro, action_text):
+    plain_message = (
+        f"Hello, {user.username}.\n\n"
+        f"{intro}\n\n"
+        f"Your code: {code}\n\n"
+        "If you did not request this email, you can safely ignore it.\n"
+        "Medicine"
+    )
+    html_message = f"""
+    <div style="margin:0;padding:32px;background:#eef6f7;font-family:Segoe UI,Arial,sans-serif;color:#17212b;">
+      <div style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #d9e7ea;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px rgba(16,36,47,.12);">
+        <div style="padding:26px 30px;background:linear-gradient(135deg,#0b8f8a,#056d70);color:#ffffff;">
+          <div style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.9;">Medicine</div>
+          <h1 style="margin:10px 0 0;font-size:26px;line-height:1.2;">{heading}</h1>
+        </div>
+        <div style="padding:30px;">
+          <p style="margin:0 0 12px;font-size:16px;">Здравствуйте, <strong>{user.username}</strong>.</p>
+          <p style="margin:0 0 22px;color:#667789;font-size:15px;line-height:1.6;">{intro}</p>
+          <div style="margin:0 0 22px;padding:18px;border-radius:14px;background:#dff7f3;text-align:center;">
+            <div style="margin-bottom:6px;color:#056d70;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;">{action_text}</div>
+            <div style="font-size:34px;font-weight:900;letter-spacing:.18em;color:#17212b;">{code}</div>
+          </div>
+          <p style="margin:0;color:#667789;font-size:13px;line-height:1.5;">Если вы не запрашивали это письмо, просто проигнорируйте его.</p>
+        </div>
+      </div>
+    </div>
+    """
+    send_mail(
+        subject=subject,
+        message=plain_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[user.email],
+        html_message=html_message,
+        fail_silently=False,
+    )
+
+
 def send_confirmation_email(user):
     code=randint(100000,999999)
     EmailConfirm.objects.update_or_create(user=user,defaults={"code":code})
 
     try:
-        send_mail(
-            subject='Confirm your password',
-            message=f'''
-Hello mr(ms) {user.username}\n
-Welcome to our Medichine
-Please confirm your password {code}
-''',
-from_email=settings.DEFAULT_FROM_EMAIL,
-recipient_list=[user.email])
+        send_code_email(
+            user=user,
+            code=code,
+            subject="Medicine: код подтверждения email",
+            heading="Подтвердите ваш email",
+            intro="Добро пожаловать в Medicine. Используйте этот код, чтобы завершить регистрацию и активировать аккаунт.",
+            action_text="Код подтверждения",
+        )
     except Exception as e:
         print(e)
 
@@ -105,11 +141,13 @@ def send_reset_code(user):
         user=user,
         defaults={'code':code}
     )
-    send_mail (
-        subject='reset_password',
-        message=f'Your reset code {code}',
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email]
+    send_code_email(
+        user=user,
+        code=code,
+        subject="Medicine: код восстановления пароля",
+        heading="Восстановление пароля",
+        intro="Мы получили запрос на сброс пароля. Введите этот код на странице восстановления, чтобы задать новый пароль.",
+        action_text="Код восстановления",
     )
 
 
