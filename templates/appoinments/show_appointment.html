@@ -6,6 +6,7 @@
     <title>Document</title>
 </head>
 <body>
+    <li><a href="{% url 'redirect_dashboard' %}">Главная</a></li>
     {% for i in appointments %} 
         <b>{{i.patient}}</b>
         <p>{{i.date}}</p>

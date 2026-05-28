@@ -15,4 +15,4 @@ def create_appointment(request,pk):
 
 def show_appointment(request):
     appointment=Appointment.objects.all()
-    return render(request,'appointments/show_appointment.html',{"appointments":appointment})
+    return render(request,'appoinments/show_appointment.html',{"appointments":appointment})
