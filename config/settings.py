@@ -16,6 +16,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
+TWILIO_SMS_FROM = os.environ.get('TWILIO_SMS_FROM', '+992003993162')
+TWILIO_WA_FROM = os.environ.get('TWILIO_WA_FROM', 'whatsapp:+992003993162')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -150,10 +154,5 @@ AUTH_USER_MODEL = 'accounts.User'
 CELERY_BROKER_URL  = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_TIMEZONE    = 'Asia/Dushanbe'
-
-TWILIO_ACCOUNT_SID = 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-TWILIO_AUTH_TOKEN  = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-TWILIO_SMS_FROM    = '+992003993162'          
-TWILIO_WA_FROM     = 'whatsapp:+992003993162' 
 
 REMINDER_HOURS = [24, 12, 6]
