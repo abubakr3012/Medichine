@@ -16,3 +16,11 @@ def create_appointment(request,pk):
 def show_appointment(request):
     appointment=Appointment.objects.all()
     return render(request,'appoinments/show_appointment.html',{"appointments":appointment})
+
+def delete_appointment(request,pk):
+    
+    user=get_object_or_404(Appointment,pk=pk)
+    if request.method=='POST':
+        user.delete()
+    return redirect('appointments')
+    

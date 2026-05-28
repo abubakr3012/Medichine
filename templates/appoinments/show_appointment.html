@@ -12,6 +12,9 @@
         <p>{{i.date}}</p>
         <p>{{i.status}}</p>
         <p>{{i.created_at}}</p>
+        {% if request.user == i.user %}
+            <a href="{% url 'delete_appointment' i.id %}"><button type="submit">Удалить</button></a>
+        {% endif %} <hr>
     {% empty %}
         <p>appointments not found</p>
     {% endfor %}
