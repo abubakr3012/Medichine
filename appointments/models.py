@@ -16,6 +16,7 @@ class Appointment(models.Model):
 
     status=models.CharField(max_length=30,choices=STATUS,default='pending')
     created_at=models.DateTimeField(auto_now_add=True)
+    celery_task_ids = models.JSONField(default=list, blank=True)
 
     def __str__(self):
         return f'{self.patient.username}:{self.doctor.user.username}'

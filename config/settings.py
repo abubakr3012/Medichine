@@ -146,3 +146,14 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 LOGIN_REDIRECT_URL = "redirect_dashboard"
 
 AUTH_USER_MODEL = 'accounts.User'
+
+CELERY_BROKER_URL  = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_TIMEZONE    = 'Asia/Dushanbe'
+
+TWILIO_ACCOUNT_SID = 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+TWILIO_AUTH_TOKEN  = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+TWILIO_SMS_FROM    = '+992003993162'          
+TWILIO_WA_FROM     = 'whatsapp:+992003993162' 
+
+REMINDER_HOURS = [24, 12, 6]
