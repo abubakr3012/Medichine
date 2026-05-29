@@ -1,0 +1,41 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1>🤖 AI Медицинский Помощник</h1>
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="text" class="form-label">Ваш вопрос:</label>
+                            <textarea class="form-control" id="text" name="text" rows="4" placeholder="Напишите ваш вопрос здесь..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Получить ответ</button>
+                    </form>
+
+                    {% if error_message %}
+                    <div class="mt-4">
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ error_message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if answer %}
+                    <div class="mt-4">
+                        <h4>📝 Ответ:</h4>
+                        <div class="alert alert-info">
+                            {{ answer|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
