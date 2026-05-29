@@ -21,6 +21,8 @@ class User(AbstractUser):
     )
     age=models.PositiveIntegerField()
 
+    city = models.CharField(max_length=50, blank=True)
+
     def __str__(self):
         return self.username
 

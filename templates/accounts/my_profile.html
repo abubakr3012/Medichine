@@ -39,6 +39,10 @@
                         <dt>Возраст</dt>
                         <dd>{{ profile.age|default:profile.user.age|default:"Не указан" }}</dd>
                     </div>
+                    <div>
+                        <dt>Город</dt>
+                        <dd>{{ profile.city|default:profile.user.city|default:"Не указан" }}</dd>
+                    </div>
                 </dl>
 
                 <div class="account-actions">
