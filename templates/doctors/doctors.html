@@ -24,8 +24,7 @@
         <p><strong>Опыт:</strong> {{ i.experience }} лет</p>
         <a class="book-link button" href="{% url 'create_appointment' i.id %}">Записаться</a>
         <a href="{% url 'send_message' i.user.id %}">Написать</a>
-    
-
+        <a href="https://www.google.com/maps/search/?api=1&query={{ i.clinic|urlencode }},+{{ i.city|urlencode }}" target="_blank">📍 Показать на карте</a>
     </article>
 {% empty %}
     <p class="muted">Врачи не найдены</p>
