@@ -1,33 +1,29 @@
-import google.generativeai as genai
+from groq import Groq
 from django.conf import settings
-import warnings
-import time
-
-warnings.filterwarnings('ignore', category=FutureWarning)
 
 
 def ask_ai(user_text):
     try:
-        if not settings.GEMINI_API_KEY:
+        if not settings.GROQ_API_KEY:
             return "Ошибка: API ключ не настроен"
 
         if not user_text or len(user_text.strip()) == 0:
             return "Пожалуйста, введите ваш вопрос"
 
-        genai.configure(api_key=settings.GEMINI_API_KEY)
+        client = Groq(api_key=settings.GROQ_API_KEY)
 
-        model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash"
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile", 
+            messages=[
+                {"role": "user", "content": user_text}
+            ],
+            max_tokens=1024,
         )
 
-        time.sleep(2)  # задержка 2 секунды
-
-        response = model.generate_content(user_text)
-
-        return response.text
+        return response.choices[0].message.content
 
     except Exception as e:
         if "429" in str(e):
-            return "Лимит Gemini API превышен. Попробуйте позже."
+            return "Лимит Groq API превышен. Попробуйте позже."
 
         return f"Ошибка при обращении к AI: {str(e)}"
