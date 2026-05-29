@@ -258,12 +258,11 @@ def create_profile(request):
     if request.method=='POST':
         form=ProfileForm(request.POST, request.FILES)
         if form.is_valid():
-            ptn=Profile.objects.create(
-                user=form.cleaned_data.get('user'),
-                age=form.cleaned_data.get('age'),
-                phone=form.cleaned_data.get('phone'),
-                photo=form.cleaned_data.get('photo'),
-            )
+            profile = request.user.profile
+            profile.age = form.cleaned_data['age']
+            profile.phone = form.cleaned_data['phone']
+            profile.photo = form.cleaned_data['photo']
+            profile.save()
             return redirect('/')
         else:
             return redirect('/')

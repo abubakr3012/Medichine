@@ -3,7 +3,7 @@ from .models import Profile
 
 class ProfileForm(forms.Form):
     user=forms.ModelChoiceField(
-        queryset=Profile.objects.filter(role='Doctor').all(),
+        queryset=Profile.objects.filter(role='doctor'),
         label='Doctor name',
         )
     age=forms.IntegerField()
