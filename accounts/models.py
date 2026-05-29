@@ -52,6 +52,7 @@ class Profile(models.Model):
     age=models.PositiveIntegerField(null=True,blank=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='patient')
     phone=models.CharField(max_length=14,blank=True)
+    city = models.CharField(max_length=50, blank=True)
     photo=models.ImageField(upload_to='users/',blank=True,null=True)
 
 
