@@ -1,0 +1,14 @@
+{% extends "accounts/base.html" %}
+{% block main %}
+<form  method="post"  enctype="multipart/form-data">
+    {% csrf_token %}
+    {{form}}
+    <button type="submit">Confirm </button>
+    {% if error %}
+        <p>{{error}}</p>
+    {% endif %}
+</form>
+<div class="auth-link">
+    <p>Already confirmed? <a href="{% url 'login' %}">Sign In</a></p>
+</div>
+{% endblock %}

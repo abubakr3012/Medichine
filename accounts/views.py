@@ -8,6 +8,7 @@ from django.conf import settings
 from .models import EmailConfirm,ResetPassword,User,Profile
 from django.contrib.auth import get_user_model
 from ai.ai import ask_ai
+from .forms import ProfileForm
 User=get_user_model()
 
 
@@ -251,6 +252,24 @@ def admin_dashboard(request):
             'user': request.user
         }
     )
+
+@login_required(login_url="/login/")
+def create_profile(request):
+    if request.method=='POST':
+        form=ProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            ptn=Profile.objects.create(
+                user=form.cleaned_data.get('user'),
+                age=form.cleaned_data.get('age'),
+                phone=form.cleaned_data.get('phone'),
+                photo=form.cleaned_data.get('photo'),
+            )
+            return redirect('/')
+        else:
+            return redirect('/')
+    else:
+        form=ProfileForm()
+        return render(request,'accounts/profile_form.html',{"form":form})
 
 @login_required(login_url="/login/")
 def profile(request):

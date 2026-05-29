@@ -13,5 +13,6 @@ urlpatterns = [
     path('doctor/dashboard/',views.doctor_dashboard,name='doctor_dashboard'),
     path('admin/dashboard/',views.admin_dashboard,name='admin_dashboard'),
     path("my_profile/",views.profile,name='my_profile'),
-    path('update_profile/<int:pk>',views.update_profile,name='update_profile')
+    path('update_profile/<int:pk>',views.update_profile,name='update_profile'),
+    path('create/profile',views.create_profile,name='create_profile')
 ]
