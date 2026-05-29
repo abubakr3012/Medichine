@@ -4,6 +4,8 @@ from doctors.models import DoctorProfile
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .tasks import send_sms
+from django.utils.dateparse import parse_datetime
+
 
 @login_required(login_url='login')
 def create_appointment(request,pk):
@@ -12,7 +14,7 @@ def create_appointment(request,pk):
         Appointment.objects.create(
             patient=request.user,
             doctor=doctor,
-            date=request.POST.get('date')
+            date = parse_datetime(request.POST.get("date"))
         )
         return redirect('doctors_list')
     return render(request,'appoinments/appoinments.html',{"doctor":doctor})
