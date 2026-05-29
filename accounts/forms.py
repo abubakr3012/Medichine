@@ -5,5 +5,6 @@ class ProfileForm(forms.Form):
     age=forms.IntegerField()
     phone=forms.CharField(max_length=14)
     photo=forms.ImageField(required=False)
+    city=forms.CharField(max_length=45)
 
     
