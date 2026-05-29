@@ -73,6 +73,7 @@ def register(request):
         email=request.POST['email']
         phone=request.POST['phone']
         age=request.POST['age']
+        city=request.POST['city']
 
         if password!=password2:
             return render(request,'accounts/register.html',{"error":'passwords are not match'})
@@ -83,7 +84,7 @@ def register(request):
         elif User.objects.filter(email=email).exists():
             return render(request,'accounts/register.html',{'error':'this email is already taken'})
 
-        user=User.objects.create_user(username=username,email=email,password=password,phone=phone, role='patient',age=age)  
+        user=User.objects.create_user(username=username,email=email,password=password,phone=phone, role='patient',age=age,city=city)  
 
         user.is_active=False
         user.save()
@@ -262,6 +263,8 @@ def create_profile(request):
             profile.age = form.cleaned_data['age']
             profile.phone = form.cleaned_data['phone']
             profile.photo = form.cleaned_data['photo']
+            profile.city = form.cleaned_data['city']
+
             profile.save()
             return redirect('/')
         else:
@@ -287,6 +290,7 @@ def update_profile(request):
             profile.age = form.cleaned_data['age']
             profile.phone = form.cleaned_data['phone']
             profile.photo = form.cleaned_data['photo']
+            profile.city=form.cleaned_data['city']
             profile.save()
             return redirect('my_profile')
         else:
