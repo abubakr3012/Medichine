@@ -11,7 +11,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from appointments.models import Appointment
-from appointments.tasks import send_appointment_reminder
+from appointments.tasks import send_sms
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def _schedule_reminders(appointment: Appointment):
             )
             continue
 
-        result = send_appointment_reminder.apply_async(
+        result = send_sms.apply_async(
             args=[appointment.pk, hours],
             eta=send_at,
         )
