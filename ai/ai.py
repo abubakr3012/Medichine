@@ -11,7 +11,7 @@ def ask_ai(user_text):
         
         genai.configure(api_key=settings.GEMINI_API_KEY)
         model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
+            model_name="gemini-2.0-flash",
             system_instruction="Ты медицинский помощник. Помогай людям с информацией о здоровье. Не ставь диагноз. Если вопрос требует осмотра врача, посоветуй обратиться к профессионалу."
         )
         
