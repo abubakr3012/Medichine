@@ -1,37 +1,90 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="ru">
+<html lang="ru" data-theme="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Medicine{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script>
+        /* Применяем сохранённую тему как можно раньше, чтобы не было мигания */
+        (function () {
+            try {
+                var saved = localStorage.getItem('theme');
+                if (saved === 'dark' || saved === 'light') {
+                    document.documentElement.setAttribute('data-theme', saved);
+                }
+            } catch (e) {}
+        })();
+    </script>
 </head>
 <body class="{% block body_class %}{% endblock %}">
     <div class="site-layout">
         <nav class="site-nav" aria-label="Навигация">
-            <a class="site-brand" href="{% url 'redirect_dashboard' %}">Medicine</a>
+            <a class="site-brand" href="{% url 'redirect_dashboard' %}">
+                <span class="brand-icon">+</span>
+                <span>Medicine</span>
+            </a>
+            <p class="nav-section-label">Меню</p>
             <ul class="nav-list">
                 {% block nav %}
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'redirect_dashboard' %}">Главная</a></li>
-                    <li><a href="{% url 'my_profile' %}">Мой профиль</a></li>
-                    <li><a href="{% url 'global_chat' %}">Советы</a></li>
-                    <li><a href="{% url 'doctors_list' %}">Список врачей</a></li>
-                    <li><a href="{% url 'show_messages' %}">Сообщение</a></li>
-                    <li><a href="{% url 'appointments' %}">Назначения</a></li>
-                    <li><a href="{% url 'login' %}">Выход</a></li>
+                    <li><a href="{% url 'redirect_dashboard' %}"><span class="nav-icon">🏠</span>Главная</a></li>
+                    <li><a href="{% url 'my_profile' %}"><span class="nav-icon">👤</span>Мой профиль</a></li>
+                    <li><a href="{% url 'global_chat' %}"><span class="nav-icon">💡</span>Советы</a></li>
+                    <li><a href="{% url 'doctors_list' %}"><span class="nav-icon">🩺</span>Список врачей</a></li>
+                    <li><a href="{% url 'show_messages' %}"><span class="nav-icon">✉️</span>Сообщение</a></li>
+                    <li><a href="{% url 'appointments' %}"><span class="nav-icon">📅</span>Назначения</a></li>
+                    <li><a href="{% url 'login' %}"><span class="nav-icon">🚪</span>Выход</a></li>
                 {% else %}
-                    <li><a href="{% url 'login' %}">Вход</a></li>
-                    <li><a href="{% url 'register' %}">Регистрация</a></li>
-                    <li><a href="{% url 'global_chat' %}">Советы</a></li>
+                    <li><a href="{% url 'login' %}"><span class="nav-icon">🔑</span>Вход</a></li>
+                    <li><a href="{% url 'register' %}"><span class="nav-icon">📝</span>Регистрация</a></li>
+                    <li><a href="{% url 'global_chat' %}"><span class="nav-icon">💡</span>Советы</a></li>
                 {% endif %}
                 {% endblock %}
             </ul>
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Переключить тему">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-text">Тёмная тема</span>
+            </button>
         </nav>
         <main class="site-content">
             {% block main %}{% endblock %}
         </main>
     </div>
+    <script>
+        (function () {
+            var root = document.documentElement;
+            var toggle = document.getElementById('themeToggle');
+            if (!toggle) return;
+            var iconEl = toggle.querySelector('.theme-toggle-icon');
+            var textEl = toggle.querySelector('.theme-toggle-text');
+
+            function currentTheme() {
+                var attr = root.getAttribute('data-theme');
+                if (attr === 'dark' || attr === 'light') return attr;
+                /* Если тема не задана вручную — берём системную */
+                return window.matchMedia &&
+                    window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? 'dark' : 'light';
+            }
+
+            function render() {
+                var isDark = currentTheme() === 'dark';
+                if (iconEl) iconEl.textContent = isDark ? '☀️' : '🌙';
+                if (textEl) textEl.textContent = isDark ? 'Светлая тема' : 'Тёмная тема';
+            }
+
+            toggle.addEventListener('click', function () {
+                var next = currentTheme() === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', next);
+                try { localStorage.setItem('theme', next); } catch (e) {}
+                render();
+            });
+
+            render();
+        })();
+    </script>
 </body>
 </html>
+
