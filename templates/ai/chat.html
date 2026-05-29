@@ -33,43 +33,36 @@
                         </div>
                     </div>
                     {% endif %}
+
+                    {% if doctors %}
+                    <div class="mt-4">
+                        <h4>👨‍⚕️ Рекомендуемые врачи:</h4>
+                        {% for doc in doctors %}
+                        <div class="card mb-3">
+                            <div class="card-body d-flex align-items-center gap-3">
+                                {% if doc.photo %}
+                                    <img src="{{ doc.photo.url }}" alt="" width="60" height="60" style="border-radius:50%; object-fit:cover;">
+                                {% else %}
+                                    <img src="/media/user.png" alt="" width="60" height="60" style="border-radius:50%;">
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-1">{{ doc.user }}</h6>
+                                    <p class="mb-0 text-muted">{{ doc.speciality }} — {{ doc.city }}</p>
+                                    <p class="mb-0 text-muted">🏥 {{ doc.clinic }}</p>
+                                </div>
+                                <div class="ms-auto">
+                                    <a href="{% url 'create_appointment' doc.id %}" class="btn btn-sm btn-primary">Записаться</a>
+                                    <a href="https://www.google.com/maps/search/?api=1&query={{ doc.clinic|urlencode }},+{{ doc.city|urlencode }}" target="_blank" class="btn btn-sm btn-outline-secondary">📍 Карта</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% if answer %}
-<div class="mt-4">
-    <h4>📝 Ответ:</h4>
-    <div class="alert alert-info">
-        {{ answer|linebreaks }}
-    </div>
-</div>
-{% endif %}
-
-{% if doctors %}
-<div class="mt-4">
-    <h4>👨‍⚕️ Рекомендуемые врачи:</h4>
-    {% for doc in doctors %}
-    <div class="card mb-3">
-        <div class="card-body d-flex align-items-center gap-3">
-            {% if doc.photo %}
-                <img src="{{ doc.photo.url }}" alt="" width="60" height="60" style="border-radius:50%; object-fit:cover;">
-            {% else %}
-                <img src="/media/user.png" alt="" width="60" height="60" style="border-radius:50%;">
-            {% endif %}
-            <div>
-                <h6 class="mb-1">{{ doc.user }}</h6>
-                <p class="mb-0 text-muted">{{ doc.speciality }} — {{ doc.city }}</p>
-                <p class="mb-0 text-muted">🏥 {{ doc.clinic }}</p>
-            </div>
-            <div class="ms-auto">
-                <a href="{% url 'create_appointment' doc.id %}" class="btn btn-sm btn-primary">Записаться</a>
-                <a href="https://www.google.com/maps/search/?api=1&query={{ doc.clinic|urlencode }},+{{ doc.city|urlencode }}" target="_blank" class="btn btn-sm btn-outline-secondary">📍 Карта</a>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
 {% endblock %}
