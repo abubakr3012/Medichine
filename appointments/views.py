@@ -3,6 +3,7 @@ from .models import Appointment
 from doctors.models import DoctorProfile
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from .tasks import send_sms
 
 @login_required(login_url='login')
 def create_appointment(request,pk):
@@ -38,3 +39,22 @@ def delete_appointment(request,pk):
         appointment.delete()
     return redirect('appointments')
     
+@login_required
+def appointment_create(request, pk):
+
+    doctor = DoctorProfile.objects.get(id=pk)
+
+    if request.method == 'POST':
+
+        appointment = Appointment.objects.create(
+            patient=request.user,
+            doctor=doctor,
+            date=request.POST.get('date')
+        )
+
+        send_sms(
+            "+992003993162",
+            f"Вы записаны к врачу {doctor} на {appointment.date}"
+        )
+
+        return redirect('my_appointments')
