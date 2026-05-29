@@ -1,5 +1,32 @@
 from groq import Groq
 from django.conf import settings
+import json
+
+
+def get_speciality(user_text):
+    """ИИ определяет нужную специальность врача"""
+    try:
+        client = Groq(api_key=settings.GROQ_API_KEY)
+
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {
+                    "role": "system",
+                    "content": """Ты медицинский помощник. По жалобе пользователя определи специальность врача.
+Отвечай ТОЛЬКО одним словом на русском языке — специальность врача.
+Примеры: стоматолог, кардиолог, невролог, терапевт, хирург, офтальмолог, дерматолог, педиатр, ортопед, уролог.
+Если не можешь определить — напиши: терапевт"""
+                },
+                {"role": "user", "content": user_text}
+            ],
+            max_tokens=20,
+        )
+
+        return response.choices[0].message.content.strip().lower()
+
+    except Exception:
+        return None
 
 
 def ask_ai(user_text):
@@ -13,7 +40,7 @@ def ask_ai(user_text):
         client = Groq(api_key=settings.GROQ_API_KEY)
 
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile", 
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "user", "content": user_text}
             ],
