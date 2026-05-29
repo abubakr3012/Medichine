@@ -279,22 +279,23 @@ def profile(request):
     })
 
 @login_required(login_url='/login/')
-def update_profile(request,pk):
-    profile=get_object_or_404(Profile,pk=pk)
-    if request.method=="POST":
-        profile.user.username=request.POST['username']
-        profile.user.email=request.POST['email']
-
-        profile.user.save()
-
-        profile.phone=request.POST['phone']
-        profile.age=request.POST['age']
-
-        if request.FILES.get('photo'):
-            
-            profile.photo=request.FILES.get('photo')
-    
-        profile.save()
-        return redirect('my_profile')
-    return render(request,'accounts/update_profile.html',{"profile":profile})
-
+def update_profile(request):
+    profile = request.user.profile
+    if request.method=='POST':
+        form=ProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            profile.age = form.cleaned_data['age']
+            profile.phone = form.cleaned_data['phone']
+            profile.photo = form.cleaned_data['photo']
+            profile.save()
+            return redirect('my_profile')
+        else:
+            return redirect('dashboard')
+    else:
+        form=ProfileForm(
+            initial={
+                'age':profile.age,
+                'phone':profile.phone
+            }
+        )
+        return render(request,'accounts/profile_form.html',{"form":form})
