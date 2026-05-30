@@ -110,6 +110,7 @@ def login_user(request):
     else:
         return render(request,'accounts/login.html')
 
+@login_required(login_url='login')
 def logout_user(request):
     logout(request)
     return render(request,'accounts/login.html')
