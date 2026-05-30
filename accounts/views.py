@@ -197,7 +197,7 @@ def reset_confirm(request):
 
     return redirect('forget_password')
 
-@login_required
+@login_required(login_url='login')
 def redirect_dashboard(request):
 
     if request.user.role == 'doctor':
@@ -212,7 +212,7 @@ def redirect_dashboard(request):
     return redirect('login')
 
 
-@login_required
+@login_required(login_url='login')
 def patient_dashboard(request):
     answer = ""
 
@@ -230,7 +230,7 @@ def patient_dashboard(request):
         }
     )
 
-@login_required
+@login_required(login_url='login')
 def doctor_dashboard(request):
 
     return render(
@@ -241,7 +241,7 @@ def doctor_dashboard(request):
         }
     )
 
-@login_required
+@login_required(login_url='login')
 def admin_dashboard(request):
 
     return render(
@@ -252,7 +252,7 @@ def admin_dashboard(request):
         }
     )
 
-@login_required(login_url="/login/")
+@login_required(login_url='login')
 def create_profile(request):
     if request.method=='POST':
         form=ProfileForm(request.POST, request.FILES)
@@ -271,7 +271,7 @@ def create_profile(request):
         form=ProfileForm()
         return render(request,'accounts/profile_form.html',{"form":form})
 
-@login_required(login_url="/login/")
+@login_required(login_url='login')
 def profile(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
 
@@ -279,7 +279,7 @@ def profile(request):
         "profile": profile
     })
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def update_profile(request):
     profile = request.user.profile
     if request.method=='POST':

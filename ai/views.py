@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from .ai import ask_ai, get_speciality
 from doctors.models import DoctorProfile
+from django.contrib.auth.decorators import login_required
 
-
+@login_required(login_url='login')
 def ai_chat(request):
     answer = ""
     error_message = ""
