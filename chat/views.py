@@ -47,6 +47,7 @@ def delete_message(request,pk):
         ms.delete()
     return redirect('global_chat')
 
+@login_required(login_url='login')
 def profile_view(request,username):
     profile=get_object_or_404(User,username=username)
     return render(request,'accounts/profile.html',{'profile':profile})

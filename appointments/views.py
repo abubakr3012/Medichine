@@ -41,7 +41,7 @@ def delete_appointment(request,pk):
         appointment.delete()
     return redirect('appointments')
     
-@login_required
+@login_required(login_url='login')
 def appointment_create(request, pk):
 
     doctor = DoctorProfile.objects.get(id=pk)

@@ -1,7 +1,9 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from .models import DoctorProfile
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q,Max,Count
 
+@login_required(login_url='login')
 def show_all_doctors(request):
     profile=DoctorProfile.objects.select_related('user').filter(user__role='doctor')
     q=request.GET.get('q','').strip()
