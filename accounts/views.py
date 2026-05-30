@@ -10,7 +10,6 @@ from ai.ai import ask_ai
 from .forms import ProfileForm
 User=get_user_model()
 
-
 def send_code_email(user, code, subject, heading, intro, action_text):
     plain_message = (
         f"Hello, {user.username}.\n\n"
