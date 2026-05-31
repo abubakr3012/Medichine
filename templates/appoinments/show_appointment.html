@@ -10,7 +10,7 @@
 </header>
 
 <section class="appointments-list">
-    {% for i in appointments %}
+    {% for i in object_list %}
         <article class="appointment-card panel">
             <div class="appointment-date">
                 <span>{{ i.date|date:"d.m" }}</span>
@@ -47,6 +47,7 @@
                     {% csrf_token %}
                     <button class="danger-button" type="submit">Удалить</button>
                 </form>
+                <a href="{% url 'update_appointment' i.id %}">Обновить</a>
             {% endif %}
         </article>
     {% empty %}

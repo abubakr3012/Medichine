@@ -5,57 +5,48 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .tasks import send_sms
 from django.utils.dateparse import parse_datetime
+from django.views import generic
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.utils import timezone
 
 
-@login_required(login_url='login')
-def create_appointment(request, pk):
-    doctor = get_object_or_404(DoctorProfile, pk=pk)
+class AppointmentCreateView(LoginRequiredMixin,generic.CreateView):
+    model=Appointment
+    fields=['date']
+    success_url=reverse_lazy('appointments')
+    template_name='appoinments/appoinments.html'
 
-    if request.method == 'POST':
-        date = parse_datetime(request.POST.get('date'))
+    def form_valid(self, form):
+        doctor=get_object_or_404(DoctorProfile,pk=self.kwargs['pk'])
+        form.instance.doctor=doctor
+        form.instance.patient=self.request.user
 
-        if not date:
-            return redirect('appointments')
-
-        exists = Appointment.objects.filter(
-            doctor=doctor,
-            date=date,
-            status__in=['pending', 'approved']
-        ).exists()
-
-        if exists:
-            return redirect('appointments')
-
-        Appointment.objects.create(
-            patient=request.user,
-            doctor=doctor,
-            date=date
-        )
-        return redirect('doctors_list')
-    return render(request,'appoinments/appoinments.html',{"doctor":doctor})
-
-@login_required(login_url='login')
-def show_appointment(request):
-    if request.user.is_superuser:
-        appointment=Appointment.objects.select_related('patient', 'doctor__user').all()
-    else:
-        appointment=Appointment.objects.select_related('patient', 'doctor__user').filter(
-            Q(patient=request.user) | Q(doctor__user=request.user)
-        )
-    return render(request,'appoinments/show_appointment.html',{"appointments":appointment})
-
-@login_required(login_url='login')
-def delete_appointment(request,pk):
-    appointment=get_object_or_404(Appointment,pk=pk)
-    can_delete = (
-        request.user.is_superuser or
-        request.user == appointment.patient or
-        request.user == appointment.doctor.user
-    )
-    if request.method == 'POST' and can_delete:
-        appointment.delete()
-    return redirect('appointments')
+        return super().form_valid(form)
     
+class AppointmentListView(LoginRequiredMixin,generic.ListView):
+    model=Appointment
+
+    def get_queryset(self):
+        return Appointment.objects.select_related('doctor')
+    template_name='appoinments/show_appointment.html'
+
+class AppointmentDeleteView(LoginRequiredMixin,generic.DeleteView):
+    model=Appointment
+    success_url=reverse_lazy('appointments')
+
+class AppointmentUpdateView(LoginRequiredMixin,generic.UpdateView):
+    model=Appointment
+    fields=['date','status']
+    success_url=reverse_lazy('appointments')
+    template_name='appoinments/update_appointment.html'
+
+    Appointment.objects.filter(
+        status='pending',
+        date__lte=timezone.now()
+    ).update(status='approved')
+
+
 @login_required(login_url='login')
 def appointment_create(request, pk):
 
