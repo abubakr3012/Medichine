@@ -75,3 +75,4 @@ def appointment_create(request, pk):
         )
 
         return redirect('my_appointments')
+    
