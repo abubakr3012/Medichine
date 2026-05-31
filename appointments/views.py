@@ -26,10 +26,15 @@ class AppointmentCreateView(LoginRequiredMixin,generic.CreateView):
     
 class AppointmentListView(LoginRequiredMixin,generic.ListView):
     model=Appointment
+    template_name='appoinments/show_appointment.html'
 
     def get_queryset(self):
+        Appointment.objects.filter(
+            status='pending',
+            date__lte=timezone.now()
+        ).update(status='approved')
+
         return Appointment.objects.select_related('doctor')
-    template_name='appoinments/show_appointment.html'
 
 class AppointmentDeleteView(LoginRequiredMixin,generic.DeleteView):
     model=Appointment
@@ -40,12 +45,6 @@ class AppointmentUpdateView(LoginRequiredMixin,generic.UpdateView):
     fields=['date','status']
     success_url=reverse_lazy('appointments')
     template_name='appoinments/update_appointment.html'
-
-    Appointment.objects.filter(
-        status='pending',
-        date__lte=timezone.now()
-    ).update(status='approved')
-
 
 @login_required(login_url='login')
 def appointment_create(request, pk):
