@@ -29,17 +29,17 @@
             <ul class="nav-list">
                 {% block nav %}
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'redirect_dashboard' %}"><span class="nav-icon">🏠</span>Главная</a></li>
-                    <li><a href="{% url 'my_profile' %}"><span class="nav-icon">👤</span>Мой профиль</a></li>
-                    <li><a href="{% url 'global_chat' %}"><span class="nav-icon">💡</span>Советы</a></li>
-                    <li><a href="{% url 'doctors_list' %}"><span class="nav-icon">🩺</span>Список врачей</a></li>
-                    <li><a href="{% url 'show_messages' %}"><span class="nav-icon">✉️</span>Сообщение</a></li>
-                    <li><a href="{% url 'appointments' %}"><span class="nav-icon">📅</span>Назначения</a></li>
-                    <li><a href="{% url 'login' %}"><span class="nav-icon">🚪</span>Выход</a></li>
+                    <li><a href="{% url 'redirect_dashboard' %}"><span class="nav-icon"></span>Главная</a></li>
+                    <li><a href="{% url 'my_profile' %}"><span class="nav-icon"></span>Мой профиль</a></li>
+                    <li><a href="{% url 'global_chat' %}"><span class="nav-icon"></span>Советы</a></li>
+                    <li><a href="{% url 'doctors_list' %}"><span class="nav-icon"></span>Список врачей</a></li>
+                    <li><a href="{% url 'show_messages' %}"><span class="nav-icon"></span>Сообщение</a></li>
+                    <li><a href="{% url 'appointments' %}"><span class="nav-icon"></span>Назначения</a></li>
+                    <li><a href="{% url 'login' %}"><span class="nav-icon"></span>Выход</a></li>
                 {% else %}
-                    <li><a href="{% url 'login' %}"><span class="nav-icon">🔑</span>Вход</a></li>
-                    <li><a href="{% url 'register' %}"><span class="nav-icon">📝</span>Регистрация</a></li>
-                    <li><a href="{% url 'global_chat' %}"><span class="nav-icon">💡</span>Советы</a></li>
+                    <li><a href="{% url 'login' %}"><span class="nav-icon"></span>Вход</a></li>
+                    <li><a href="{% url 'register' %}"><span class="nav-icon"></span>Регистрация</a></li>
+                    <li><a href="{% url 'global_chat' %}"><span class="nav-icon"></span>Советы</a></li>
                 {% endif %}
                 {% endblock %}
             </ul>
