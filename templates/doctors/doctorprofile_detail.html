@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr {{object.user.username}}</title>
+</head>
+<body>
+<article class="doctor-profile panel">
+
+    {% if object.photo %}
+        <img src="{{ object.photo.url }}" alt="Doctor photo">
+    {% else %}
+        <img src="/media/user.png" alt="Default photo">
+    {% endif %}
+
+    <h1>{{ object.user.username }}</h1>
+
+    <p><strong>Специальность:</strong> {{ object.speciality }}</p>
+    <p><strong>Город:</strong> {{ object.city }}</p>
+    <p><strong>Клиника:</strong> {{ object.clinic }}</p>
+    <p><strong>Опыт:</strong> {{ object.experience }} лет</p>
+    <p><strong>О себе:</strong> {{ object.bio }}</p>
+
+    {% if request.user == object.user %}
+        <div class="owner-actions">
+            <a class="button" href="#">Редактировать профиль</a>
+            <a class="button danger" href="#">Удалить профиль</a>
+        </div>
+    {% endif %}
+
+</article>
+
+</body>
+</html>
