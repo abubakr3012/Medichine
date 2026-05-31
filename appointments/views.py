@@ -8,13 +8,28 @@ from django.utils.dateparse import parse_datetime
 
 
 @login_required(login_url='login')
-def create_appointment(request,pk):
-    doctor=get_object_or_404(DoctorProfile,pk=pk)
-    if request.method=='POST':
+def create_appointment(request, pk):
+    doctor = get_object_or_404(DoctorProfile, pk=pk)
+
+    if request.method == 'POST':
+        date = parse_datetime(request.POST.get('date'))
+
+        if not date:
+            return redirect('appointments')
+
+        exists = Appointment.objects.filter(
+            doctor=doctor,
+            date=date,
+            status__in=['pending', 'approved']
+        ).exists()
+
+        if exists:
+            return redirect('appointments')
+
         Appointment.objects.create(
             patient=request.user,
             doctor=doctor,
-            date = parse_datetime(request.POST.get("date"))
+            date=date
         )
         return redirect('doctors_list')
     return render(request,'appoinments/appoinments.html',{"doctor":doctor})

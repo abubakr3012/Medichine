@@ -21,9 +21,3 @@ class Appointment(models.Model):
     def __str__(self):
         return f'{self.patient.username}:{self.doctor.user.username}'
 
-class Scores(models.Model):
-    result=models.PositiveIntegerField()
-
-    def __str__(self):
-        return self.result
-    
