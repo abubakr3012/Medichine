@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
+import uuid
 
 User = settings.AUTH_USER_MODEL
 
@@ -9,6 +11,17 @@ class Message(models.Model):
     writed_at=models.DateTimeField(auto_now_add=True)
     likes=models.ManyToManyField(User,related_name='liked_messages',blank=True)
     dizlikes=models.ManyToManyField(User,related_name='dizliked_messages',blank=True)
+    slug=models.SlugField(unique=True,blank=True,null=True)
+    is_delete=models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.text}-{uuid.uuid4().hex[:8]}")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.is_delete = True
+        self.save()
 
     def __str__(self):
         return f'{self.user.username}:{self.text[:20]}'

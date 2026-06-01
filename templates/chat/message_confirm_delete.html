@@ -1,0 +1,33 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Удаление сообщения{% endblock %}
+
+{% block main %}
+
+<div class="panel" style="max-width:500px; margin:40px auto; text-align:center;">
+
+    <h2>Удалить сообщение?</h2>
+
+    <p style="color:gray;">
+        Это действие нельзя отменить.
+    </p>
+
+    <div style="margin:20px 0; padding:10px; background:#f5f5f5; border-radius:8px;">
+        <p><strong>{{ object.user.username }}</strong></p>
+        <p>{{ object.text }}</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" style="background:red; color:white; padding:10px 20px; border:none; border-radius:6px;">
+            Да, удалить
+        </button>
+    </form>
+
+    <br>
+
+    <a href="{% url 'global_chat' %}">Отмена</a>
+
+</div>
+
+{% endblock %}

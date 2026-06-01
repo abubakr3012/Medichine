@@ -3,7 +3,9 @@ from .models import Message,Direct
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-
+from django.views import generic
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 User=get_user_model()
 
@@ -18,7 +20,7 @@ def chat_page(request):
                 user=request.user
             )
         return redirect('global_chat')
-    messages = Message.objects.all().order_by("-writed_at")
+    messages = Message.objects.all().order_by("-writed_at").filter(is_delete=False)
 
     return render(request,'chat/chats.html',{"messages":messages})
 
@@ -40,12 +42,27 @@ def dizlike(request,pk):
         ms.dizlikes.remove(request.user)
     return redirect('global_chat')
 
-@login_required(login_url='login')
-def delete_message(request,pk):
-    ms=get_object_or_404(Message,pk=pk)
-    if request.user==ms.user:
-        ms.delete()
-    return redirect('global_chat')
+# @login_required(login_url='login')
+# def delete_message(request,pk):
+#     ms=get_object_or_404(Message,pk=pk)
+#     if request.user==ms.user:
+#         ms.delete()
+#     return redirect('global_chat')
+
+class MessageDeleteView(LoginRequiredMixin,generic.DeleteView):
+    model=Message
+    slug_field='slug'
+    slug_url_kwarg='slug'
+    
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.is_delete = True
+        obj.save()
+        return redirect(self.get_success_url())
+    
+    def get_success_url(self):
+        return reverse_lazy('global_chat')
+
 
 @login_required(login_url='login')
 def profile_view(request,username):
