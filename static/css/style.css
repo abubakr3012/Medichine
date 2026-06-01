@@ -1275,3 +1275,110 @@ hr {
     .dm-messages .chat-message { width: 100%; }
     .dm-action { margin-top: 0.65rem; }
 }
+
+
+
+/* ─── DOCTOR PROFILE PAGE ─── */
+
+.doctor-profile {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 2rem;
+    animation: cardIn 0.4s var(--ease-out);
+}
+
+.doctor-profile img {
+    width: 220px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 24px;
+    background: var(--primary-light);
+    border: 4px solid var(--surface);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    transition: transform var(--t) var(--ease-spring);
+}
+
+.doctor-profile img:hover {
+    transform: scale(1.03);
+}
+
+.doctor-profile-content {
+    min-width: 0;
+}
+
+.doctor-profile h1 {
+    margin-bottom: 1rem;
+}
+
+.doctor-profile-info {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.doctor-profile-info div {
+    padding: 1rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+.doctor-profile-info span {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: var(--text-3);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 700;
+}
+
+.doctor-profile-info strong {
+    font-size: .95rem;
+}
+
+.doctor-bio {
+    padding: 1rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-top: 1rem;
+}
+
+.owner-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem;
+    margin-top: 1.5rem;
+}
+
+.owner-actions .danger {
+    background: var(--accent);
+}
+
+.owner-actions .danger:hover {
+    background: #b54528;
+}
+
+@media (max-width: 768px) {
+    .doctor-profile {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .doctor-profile img {
+        margin: 0 auto;
+    }
+
+    .doctor-profile-info {
+        grid-template-columns: 1fr;
+    }
+
+    .owner-actions {
+        justify-content: center;
+    }
+}

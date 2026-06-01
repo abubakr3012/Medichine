@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dr {{object.user.username}}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
 </head>
 <body>
 <article class="doctor-profile panel">
@@ -14,22 +17,48 @@
         <img src="/media/user.png" alt="Default photo">
     {% endif %}
 
-    <h1>{{ object.user.username }}</h1>
+    <div class="doctor-profile-content">
 
-    <p><strong>Специальность:</strong> {{ object.speciality }}</p>
-    <p><strong>Город:</strong> {{ object.city }}</p>
-    <p><strong>Клиника:</strong> {{ object.clinic }}</p>
-    <p><strong>Опыт:</strong> {{ object.experience }} лет</p>
-    <p><strong>О себе:</strong> {{ object.bio }}</p>
+        <span class="eyebrow">Doctor Profile</span>
 
-    {% if request.user == object.user %}
-        <div class="owner-actions">
-            <a class="button" href="#">Редактировать профиль</a>
-            <a class="button danger" href="#">Удалить профиль</a>
+        <h1>Dr. {{ object.user.username }}</h1>
+
+        <div class="doctor-profile-info">
+            <div>
+                <span>Специальность</span>
+                <strong>{{ object.speciality }}</strong>
+            </div>
+
+            <div>
+                <span>Город</span>
+                <strong>{{ object.city }}</strong>
+            </div>
+
+            <div>
+                <span>Клиника</span>
+                <strong>{{ object.clinic }}</strong>
+            </div>
+
+            <div>
+                <span>Опыт</span>
+                <strong>{{ object.experience }} лет</strong>
+            </div>
         </div>
-    {% endif %}
+
+        <div class="doctor-bio">
+            <h3>О враче</h3>
+            <p>{{ object.bio }}</p>
+        </div>
+
+        {% if request.user == object.user %}
+            <div class="owner-actions">
+                <a class="button" href="#">Редактировать профиль</a>
+                <a class="button danger-button" href="#">Удалить профиль</a>
+            </div>
+        {% endif %}
+
+    </div>
 
 </article>
-
 </body>
 </html>
