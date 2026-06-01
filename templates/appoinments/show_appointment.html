@@ -1,5 +1,6 @@
 {% extends "accounts/base.html" %}
 {% block title %}Назначения{% endblock %}
+
 {% block main %}
 <header class="page-head appointments-head">
     <div>
@@ -10,8 +11,11 @@
 </header>
 
 <section class="appointments-list">
+
     {% for i in object_list %}
+
         <article class="appointment-card panel">
+
             <div class="appointment-date">
                 <span>{{ i.date|date:"d.m" }}</span>
                 <strong>{{ i.date|date:"H:i" }}</strong>
@@ -20,21 +24,27 @@
             <div class="appointment-main">
                 <div class="appointment-title">
                     <h2>{{ i.doctor.user.username }}</h2>
-                    <span class="status-pill status-{{ i.status }}">{{ i.get_status_display }}</span>
+                    <span class="status-pill status-{{ i.status }}">
+                        {{ i.get_status_display }}
+                    </span>
                 </div>
+
                 <dl class="appointment-details">
                     <div>
                         <dt>Пациент</dt>
                         <dd>{{ i.patient.username }}</dd>
                     </div>
+
                     <div>
                         <dt>Врач</dt>
                         <dd>{{ i.doctor.user.username }}</dd>
                     </div>
+
                     <div>
                         <dt>Дата</dt>
                         <dd>{{ i.date|date:"d.m.Y H:i" }}</dd>
                     </div>
+
                     <div>
                         <dt>Создано</dt>
                         <dd>{{ i.created_at|date:"d.m.Y H:i" }}</dd>
@@ -43,19 +53,29 @@
             </div>
 
             {% if request.user == i.patient or request.user == i.doctor.user or request.user.is_superuser %}
-                <form class="appointment-actions" action="{% url 'delete_appointment' i.id %}" method="post">
+
+                <form class="appointment-actions"
+                      action="{% url 'delete_appointment' i.slug %}"
+                      method="post">
                     {% csrf_token %}
                     <button class="danger-button" type="submit">Удалить</button>
                 </form>
-                <a href="{% url 'update_appointment' i.id %}">Обновить</a>
+
+                <a href="{% url 'update_appointment' i.slug %}">Обновить</a>
+
             {% endif %}
+
         </article>
+
     {% empty %}
+
         <div class="empty-state panel">
             <h2>Назначений пока нет</h2>
             <p class="muted">Когда вы запишетесь к врачу, запись появится здесь.</p>
             <a class="button" href="{% url 'doctors_list' %}">Найти врача</a>
         </div>
+
     {% endfor %}
+
 </section>
 {% endblock %}
