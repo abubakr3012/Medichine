@@ -1,8 +1,14 @@
 {% extends "accounts/base.html" %}
 {% block title %}Личные сообщения{% endblock %}
 {% block main %}
-<h1>Личные сообщения</h1>
-<p class="muted">Выберите пользователя для перехода в чат.</p>
+<section class="page messages-page">
+<header class="page-head compact-head">
+    <div>
+        <p class="eyebrow">Inbox</p>
+        <h1>Личные сообщения</h1>
+        <p class="muted">Выберите пользователя для перехода в чат.</p>
+    </div>
+</header>
 
 <section class="panel dm-list">
     {% for i in users %}
@@ -24,12 +30,12 @@
             </div>
             <div class="dm-action">
                 <a class="button" href="{% url 'send_message' i.id %}">Открыть чат</a>
-
-                <a href="{% url 'delete_chat' i.id %}">Удалить чат</a>
+                <a class="button danger-button" href="{% url 'delete_chat' i.id %}">Удалить чат</a>
             </div>
         </div>
     {% empty %}
         <p class="muted">Сообщений нет</p>
     {% endfor %}
+</section>
 </section>
 {% endblock %}

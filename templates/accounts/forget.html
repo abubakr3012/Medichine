@@ -1,15 +1,18 @@
 {% extends "accounts/base.html" %}
+{% block body_class %}auth-page{% endblock %}
+{% block title %}Восстановление пароля{% endblock %}
 {% block main %}
-<h2>Find Account</h2>
+<h2>Восстановление пароля</h2>
 <form action="" method="post">
     {% csrf_token %}
-    <input type="email" name="email" placeholder="Enter your email" required>
-    <button type="submit">Send Code</button>
+    <label for="email">Email</label>
+    <input id="email" type="email" name="email" placeholder="Введите email" required>
+    <button type="submit">Отправить код</button>
     {% if error %}
         <p>{{error}}</p>
     {% endif %}
 </form>
 <div class="auth-link">
-    <p>Remember your password? <a href="{% url 'login' %}">Sign in</a></p>
+    <p>Вспомнили пароль? <a href="{% url 'login' %}">Войти</a></p>
 </div>
 {% endblock %}

@@ -1,17 +1,20 @@
 {% extends "accounts/base.html" %}
+{% block body_class %}auth-page{% endblock %}
+{% block title %}Подтверждение email{% endblock %}
 {% block main %}
 <form action="{% url 'confirm' %}" method="post">
      {% csrf_token %}
-    <label for="username">username</label>
-    <input type="text" placeholder="Enter your username" name="username" id="username" value="{{username}}" required>
-    <label for="code">Code</label>
-    <input type="text" placeholder="Enter code" name="code" id="code" required>
-    <button type="submit">Confirm </button>
+    <h2>Подтверждение email</h2>
+    <label for="username">Имя пользователя</label>
+    <input type="text" placeholder="Введите имя пользователя" name="username" id="username" value="{{username}}" required>
+    <label for="code">Код</label>
+    <input type="text" placeholder="Введите код" name="code" id="code" required>
+    <button type="submit">Подтвердить</button>
     {% if error %}
         <p>{{error}}</p>
     {% endif %}
 </form>
 <div class="auth-link">
-    <p>Already confirmed? <a href="{% url 'login' %}">Sign In</a></p>
+    <p>Уже подтвердили? <a href="{% url 'login' %}">Войти</a></p>
 </div>
 {% endblock %}

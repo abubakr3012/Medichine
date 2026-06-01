@@ -1,7 +1,14 @@
 {% extends "accounts/base.html" %}
 {% block title %}Чат с {{ profile.username }}{% endblock %}
 {% block main %}
-<h1>Чат с {{ profile.username }}</h1>
+<section class="page chat-page">
+<header class="page-head compact-head">
+    <div>
+        <p class="eyebrow">Direct message</p>
+        <h1>Чат с {{ profile.username }}</h1>
+    </div>
+    <a class="button secondary-button" href="{% url 'show_messages' %}">Все сообщения</a>
+</header>
 
 <ul class="chat-list dm-messages">
     {% for i in messages %}
@@ -48,4 +55,5 @@
     <input class="chat-input" type="text" placeholder="Напишите сообщение..." name="text">
     <button class="chat-send" type="submit">Отправить</button>
 </form>
+</section>
 {% endblock %}

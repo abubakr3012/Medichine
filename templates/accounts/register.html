@@ -2,30 +2,30 @@
 {% block body_class %}auth-page{% endblock %}
 {% block title %}Регистрация{% endblock %}
 {% block main %}
-<h2>Register</h2>
+<h2>Регистрация</h2>
 <form action="" method="post">
     {% csrf_token %}
-    <label for="username">username</label>
-    <input type="text" placeholder="Enter your username" name="username" id="username">
+    <label for="username">Имя пользователя</label>
+    <input type="text" placeholder="Введите имя пользователя" name="username" id="username">
     <label for="email">Email</label>
-    <input type="email" placeholder="Enter your email" name="email" id="email">
-    <label for="phone">Phone</label>
-    <input type="tel" placeholder="Enter your phone" name="phone" id="phone" required>
-    <label for="age">Age</label>
-    <input type="number" placeholder="Enter your age" name="age" id="age" required>
-    <label for="city">city</label>
-    <input type="text" placeholder="Enter your city" name="city" id="city">
-    <label for="password">password</label>
-    <input type="password" placeholder="Enter your password" name="password" id="password">
-    <label for="password2">Confirm Password</label>
-    <input type="password" placeholder="Confirm password" name="password2" id="password2">
-    <button type="submit">Create Account</button>
+    <input type="email" placeholder="Введите email" name="email" id="email">
+    <label for="phone">Телефон</label>
+    <input type="tel" placeholder="Введите телефон" name="phone" id="phone" required>
+    <label for="age">Возраст</label>
+    <input type="number" placeholder="Введите возраст" name="age" id="age" required>
+    <label for="city">Город</label>
+    <input type="text" placeholder="Введите город" name="city" id="city">
+    <label for="password">Пароль</label>
+    <input type="password" placeholder="Введите пароль" name="password" id="password">
+    <label for="password2">Подтверждение пароля</label>
+    <input type="password" placeholder="Повторите пароль" name="password2" id="password2">
+    <button type="submit">Создать аккаунт</button>
     {% if error %}
         <p>{{error}}</p>
     {% endif %}
 </form>
 <div class="auth-link">
-    <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
-    <p>Already received a code? <a href="{% url 'confirm' %}">Confirm email</a></p>
+    <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+    <p>Уже получили код? <a href="{% url 'confirm' %}">Подтвердить email</a></p>
 </div>
 {% endblock %}

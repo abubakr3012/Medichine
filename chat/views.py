@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from accounts.models import Profile
 
 User=get_user_model()
 
@@ -72,6 +73,12 @@ def profile_view(request,username):
 @login_required(login_url='login')
 def send_message(request,pk):
     ptn=get_object_or_404(User,pk=pk)
+    Profile.objects.get_or_create(user=request.user)
+    Profile.objects.get_or_create(user=ptn)
+
+    if ptn == request.user:
+        return redirect('show_messages')
+
     if request.method == 'POST':
         text = request.POST.get("text", "").strip()
         if text:
@@ -85,18 +92,20 @@ def send_message(request,pk):
     message=Direct.objects.filter(
         Q(sender=request.user, receiner=ptn) |
         Q(sender=ptn, receiner=request.user)
-    ).order_by("created_at")
+    ).select_related("sender", "receiner", "sender__profile", "receiner__profile").order_by("created_at")
     message.filter(receiner=request.user, is_readed=False).update(is_readed=True)
     return render(request,'chat/send_message.html',{"messages":message,"profile":ptn})
 
 @login_required(login_url='login')
 def show_messages(request):
     user=request.user
-    messages=Direct.objects.filter(Q(sender=user)|Q(receiner=user)).order_by("created_at")
-    users=User.objects.filter(
+    users=list(User.objects.filter(
         Q(send_messages__receiner=user)|
         Q(received_messages__sender=user)
-    ).distinct()
+    ).distinct())
+    for companion in users:
+        profile, _ = Profile.objects.get_or_create(user=companion)
+        companion.profile = profile
     return render(request,'chat/show_messages.html',{"users":users})
 
 @login_required(login_url='login')

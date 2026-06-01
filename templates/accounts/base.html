@@ -22,29 +22,29 @@
     <div class="site-layout">
         <nav class="site-nav" aria-label="Навигация">
             <a class="site-brand" href="{% url 'redirect_dashboard' %}">
-                <span class="brand-icon">+</span>
-                <span>Medicine</span>
+                <span class="brand-icon">M</span>
+                <span>Medichine</span>
             </a>
             <p class="nav-section-label">Меню</p>
             <ul class="nav-list">
                 {% block nav %}
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'redirect_dashboard' %}"><span class="nav-icon"></span>Главная</a></li>
-                    <li><a href="{% url 'my_profile' %}"><span class="nav-icon"></span>Мой профиль</a></li>
-                    <li><a href="{% url 'global_chat' %}"><span class="nav-icon"></span>Советы</a></li>
-                    <li><a href="{% url 'doctors_list' %}"><span class="nav-icon"></span>Список врачей</a></li>
-                    <li><a href="{% url 'show_messages' %}"><span class="nav-icon"></span>Сообщение</a></li>
-                    <li><a href="{% url 'appointments' %}"><span class="nav-icon"></span>Назначения</a></li>
-                    <li><a href="{% url 'login' %}"><span class="nav-icon"></span>Выход</a></li>
+                    <li><a href="{% url 'redirect_dashboard' %}"><span class="nav-icon">01</span>Главная</a></li>
+                    <li><a href="{% url 'my_profile' %}"><span class="nav-icon">02</span>Мой профиль</a></li>
+                    <li><a href="{% url 'global_chat' %}"><span class="nav-icon">03</span>Советы</a></li>
+                    <li><a href="{% url 'doctors_list' %}"><span class="nav-icon">04</span>Список врачей</a></li>
+                    <li><a href="{% url 'show_messages' %}"><span class="nav-icon">05</span>Сообщение</a></li>
+                    <li><a href="{% url 'appointments' %}"><span class="nav-icon">06</span>Назначения</a></li>
+                    <li><a href="{% url 'login' %}"><span class="nav-icon">07</span>Выход</a></li>
                 {% else %}
-                    <li><a href="{% url 'login' %}"><span class="nav-icon"></span>Вход</a></li>
-                    <li><a href="{% url 'register' %}"><span class="nav-icon"></span>Регистрация</a></li>
-                    <li><a href="{% url 'global_chat' %}"><span class="nav-icon"></span>Советы</a></li>
+                    <li><a href="{% url 'login' %}"><span class="nav-icon">01</span>Вход</a></li>
+                    <li><a href="{% url 'register' %}"><span class="nav-icon">02</span>Регистрация</a></li>
+                    <li><a href="{% url 'global_chat' %}"><span class="nav-icon">03</span>Советы</a></li>
                 {% endif %}
                 {% endblock %}
             </ul>
             <button type="button" class="theme-toggle" id="themeToggle" aria-label="Переключить тему">
-                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon">D</span>
                 <span class="theme-toggle-text">Тёмная тема</span>
             </button>
         </nav>
@@ -71,7 +71,7 @@
 
             function render() {
                 var isDark = currentTheme() === 'dark';
-                if (iconEl) iconEl.textContent = isDark ? '☀️' : '🌙';
+                if (iconEl) iconEl.textContent = isDark ? 'L' : 'D';
                 if (textEl) textEl.textContent = isDark ? 'Светлая тема' : 'Тёмная тема';
             }
 

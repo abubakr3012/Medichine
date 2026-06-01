@@ -1,7 +1,13 @@
 {% extends "accounts/base.html" %}
 {% block title %}Список врачей{% endblock %}
 {% block main %}
-<h1>Список врачей</h1>
+<header class="page-head">
+    <div>
+        <p class="eyebrow">Directory</p>
+        <h1>Список врачей</h1>
+        <p class="muted">Поиск специалиста, запись на приём и быстрый переход к коммуникации.</p>
+    </div>
+</header>
 
 <form class="search-bar panel" action="" method="get">
     {% csrf_token %}
@@ -19,10 +25,12 @@
         <h3>{{ i.user }}</h3>
         <p><strong>Специальность:</strong> {{ i.speciality }}</p>
         <p><strong>Город:</strong> {{ i.city }}</p>
-        <a class="book-link button" href="{% url 'create_appointment' i.pk %}">Записаться</a>
-        <a href="{% url 'send_message' i.user.id %}">Написать</a>
-        <a href="{% url 'detail' i.id %}">Болшее</a>
-        <a href="https://www.google.com/maps/search/?api=1&query={{ i.clinic|urlencode }},+{{ i.city|urlencode }}" target="_blank">Показать на карте</a>
+        <div class="doctor-actions">
+            <a class="book-link button" href="{% url 'create_appointment' i.pk %}">Записаться</a>
+            <a class="button secondary-button" href="{% url 'send_message' i.user.id %}">Написать</a>
+            <a class="button secondary-button" href="{% url 'detail' i.id %}">Профиль</a>
+            <a class="button secondary-button" href="https://www.google.com/maps/search/?api=1&query={{ i.clinic|urlencode }},+{{ i.city|urlencode }}" target="_blank">Карта</a>
+        </div>
     </article>
 {% empty %}
     <p class="muted">Врачи не найдены</p>
