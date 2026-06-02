@@ -18,16 +18,16 @@
     </a>
 </header>
 
-<ul class="chat-list dm-messages">
+<ul class="chat-list dm-messages" id="chat-list">
 
     {% for i in messages %}
         <li class="chat-message {% if i.sender == request.user %}msg-own{% else %}msg-other{% endif %}">
 
             <div class="msg-avatar">
                 {% if i.sender.profile.photo %}
-                    <img src="{{ i.sender.profile.photo.url }}" alt="">
+                    <img src="{{ i.sender.profile.photo.url }}">
                 {% else %}
-                    <img src="/media/user.png" alt="">
+                    <img src="/media/user.png">
                 {% endif %}
             </div>
 
@@ -86,7 +86,7 @@
     <label for="photo-input" class="photo-btn">📎</label>
     <input id="photo-input" type="file" name="photo" hidden>
 
-    <!-- VOICE RECORD BUTTON -->
+    <!-- VOICE -->
     <label id="record-btn" class="photo-btn">🎤</label>
     <input id="voice-input" type="file" name="voice" hidden>
 
@@ -98,6 +98,7 @@
 
 </section>
 
+<!-- 🎤 VOICE RECORD -->
 <script>
 let mediaRecorder;
 let audioChunks = [];
@@ -135,8 +136,7 @@ recordBtn.addEventListener("click", async function (e) {
             const dt = new DataTransfer();
             dt.items.add(audioFile);
 
-            const input = document.getElementById("voice-input");
-            input.files = dt.files;
+            document.getElementById("voice-input").files = dt.files;
 
             recordBtn.textContent = "✅";
         };
@@ -147,6 +147,48 @@ recordBtn.addEventListener("click", async function (e) {
     } else {
         mediaRecorder.stop();
     }
+});
+</script>
+
+<!-- ⚡ WEB SOCKET -->
+<script>
+const chatSocket = new WebSocket(
+    'ws://' + window.location.host + '/ws/chat/{{ profile.id }}/'
+);
+
+chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+
+    const chatList = document.getElementById("chat-list");
+
+    chatList.innerHTML += `
+        <li class="chat-message msg-other">
+            <div class="msg-body">
+                <div class="msg-meta">
+                    <b>${data.sender}</b>
+                </div>
+                <div class="msg-bubble">
+                    <p>${data.message}</p>
+                </div>
+            </div>
+        </li>
+    `;
+
+    chatList.scrollTop = chatList.scrollHeight;
+};
+
+document.querySelector("form").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const textInput = document.querySelector("input[name='text']");
+
+    chatSocket.send(JSON.stringify({
+        message: textInput.value,
+        sender: "{{ request.user.id }}",
+        receiver: "{{ profile.id }}"
+    }));
+
+    textInput.value = "";
 });
 </script>
 
