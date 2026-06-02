@@ -13,6 +13,7 @@ class Message(models.Model):
     dizlikes=models.ManyToManyField(User,related_name='dizliked_messages',blank=True)
     slug=models.SlugField(unique=True,blank=True,null=True)
     is_delete=models.BooleanField(default=False)
+    photo=models.ImageField(upload_to='mesage/',blank=True,null=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -32,6 +33,7 @@ class Direct(models.Model):
     text=models.TextField()
     created_at=models.DateTimeField(auto_now_add=True)
     is_readed=models.BooleanField(default=False)
+    photo=models.ImageField(upload_to='direct/',blank=True,null=True)
 
     def __str__(self):
         return f'{self.sender.username}:{self.receiner.username}'

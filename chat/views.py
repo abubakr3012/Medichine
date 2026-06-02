@@ -7,6 +7,7 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from accounts.models import Profile
+from .forms import DirectForm
 
 User=get_user_model()
 
