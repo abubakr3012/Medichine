@@ -1,18 +1,27 @@
 {% extends "accounts/base.html" %}
-{% block title %}Чат с {{ profile.username }}{% endblock %}
+
+{% block title %}
+Чат с {{ profile.username }}
+{% endblock %}
+
 {% block main %}
 <section class="page chat-page">
+
 <header class="page-head compact-head">
     <div>
         <p class="eyebrow">Direct message</p>
         <h1>Чат с {{ profile.username }}</h1>
     </div>
-    <a class="button secondary-button" href="{% url 'show_messages' %}">Все сообщения</a>
+
+    <a class="button secondary-button" href="{% url 'show_messages' %}">
+        Все сообщения
+    </a>
 </header>
 
 <ul class="chat-list dm-messages">
     {% for i in messages %}
         <li class="chat-message {% if i.sender == request.user %}msg-own{% else %}msg-other{% endif %}">
+
             <div class="msg-avatar">
                 {% if i.sender.profile.photo %}
                     <img src="{{ i.sender.profile.photo.url }}" alt="">
@@ -22,6 +31,7 @@
             </div>
 
             <div class="msg-body">
+
                 <div class="msg-meta">
                     <b>
                         {% if i.sender == request.user %}
@@ -33,7 +43,18 @@
                 </div>
 
                 <div class="msg-bubble">
-                    <p>{{ i.text }}</p>
+
+                    {% if i.photo %}
+                        <img
+                            src="{{ i.photo.url }}"
+                            alt=""
+                            style="max-width:250px;border-radius:10px;margin-bottom:10px;">
+                    {% endif %}
+
+                    {% if i.text %}
+                        <p>{{ i.text }}</p>
+                    {% endif %}
+
                 </div>
 
                 <div class="msg-read">
@@ -43,25 +64,32 @@
                         Не прочитано
                     {% endif %}
                 </div>
+
             </div>
+
         </li>
     {% empty %}
         <p class="muted">Сообщений нет</p>
     {% endfor %}
 </ul>
 
-<form class="chat-form chat-form-inline" action="" method="post" enctype="multipart/form-data">
+<form class="chat-form chat-form-inline"
+      action=""
+      method="post"
+      enctype="multipart/form-data">
+
     {% csrf_token %}
 
-    <input class="chat-input"
-           type="text"
-           placeholder="Напишите сообщение..."
-           name="text">
+    <input
+        class="chat-input"
+        type="text"
+        placeholder="Напишите сообщение..."
+        name="text">
 
-    <label for="photo-input">
-        <img src="/media/file.png" class="file" style="cursor:pointer;">
+    <label for="photo-input" class="photo-btn">
+        📎
     </label>
-
+    
     <input
         id="photo-input"
         type="file"
@@ -71,6 +99,8 @@
     <button class="chat-send" type="submit">
         Отправить
     </button>
+
 </form>
+
 </section>
 {% endblock %}

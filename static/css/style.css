@@ -1648,6 +1648,29 @@ form,
     border-radius: 8px;
 }
 
+.photo-btn {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f1f5f9;
+    cursor: pointer;
+    font-size: 20px;
+    transition: 0.2s;
+}
+
+.photo-btn:hover {
+    background: #e2e8f0;
+    transform: scale(1.05);
+}
+
+.photo-btn:active {
+    transform: scale(0.95);
+}
+
+
 @media (prefers-reduced-motion: no-preference) {
     .nav-list li,
     .panel,
