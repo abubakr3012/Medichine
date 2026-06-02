@@ -99,15 +99,34 @@ def send_message(request,pk):
 
 @login_required(login_url='login')
 def show_messages(request):
-    user=request.user
-    users=list(User.objects.filter(
+    user = request.user
+
+    users = User.objects.filter(
         Q(send_messages__receiner=user)|
         Q(received_messages__sender=user)
-    ).distinct())
+    ).exclude(id=user.id).distinct()
+
+    dialogs = []
+
     for companion in users:
-        profile, _ = Profile.objects.get_or_create(user=companion)
-        companion.profile = profile
-    return render(request,'chat/show_messages.html',{"users":users})
+        last_message = Direct.objects.filter(
+            Q(sender=user, receiner=companion)|
+            Q(sender=companion, receiner=user)
+        ).order_by('-created_at').first()
+
+        dialogs.append({
+            "user": companion,
+            "last_message": last_message
+        })
+
+    dialogs.sort(
+        key=lambda x: x["last_message"].created_at if x["last_message"] else 0,
+        reverse=True
+    )
+
+    return render(request, "chat/show_messages.html", {
+        "dialogs": dialogs
+    })
 
 @login_required(login_url='login')
 def delete_chat(request, pk):

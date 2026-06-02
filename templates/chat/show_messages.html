@@ -11,26 +11,26 @@
 </header>
 
 <section class="panel dm-list">
-    {% for i in users %}
+    {% for i in dialogs %}
         <div class="dm-item">
             <div class="dm-avatar">
-                {% if i.profile.photo %}
-                    <img src="{{ i.profile.photo.url }}" alt="">
+                {% if i.user.profile.photo %}
+                    <img src="{{ i.user.profile.photo.url }}" alt="">
                 {% else %}
                     <img src="/media/user.png" alt="">
                 {% endif %}
             </div>
             <div class="dm-meta">
                 <div class="dm-name">
-                    <a href="{% url 'send_message' i.id %}">{{ i.username }}</a>
+                    <a href="{% url 'send_message' i.user.id %}">{{ i.user.username }}</a>
                 </div>
                 <div class="dm-sub">
-                    <span class="badge badge-{{ i.profile.role }}">{{ i.profile.get_role_display }}</span>
+                    <span class="badge badge-{{ i.user.profile.role }}">{{ i.user.profile.get_role_display }}</span>
                 </div>
             </div>
             <div class="dm-action">
-                <a class="button" href="{% url 'send_message' i.id %}">Открыть чат</a>
-                <a class="button danger-button" href="{% url 'delete_chat' i.id %}">Удалить чат</a>
+                <a class="button" href="{% url 'send_message' i.user.id %}">Открыть чат</a>
+                <a class="button danger-button" href="{% url 'delete_chat' i.user.id %}">Удалить чат</a>
             </div>
         </div>
     {% empty %}
