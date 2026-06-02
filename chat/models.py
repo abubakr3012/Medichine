@@ -14,7 +14,6 @@ class Message(models.Model):
     slug=models.SlugField(unique=True,blank=True,null=True)
     is_delete=models.BooleanField(default=False)
     photo=models.ImageField(upload_to='mesage/',blank=True,null=True)
-    voice = models.FileField(upload_to='voice/',blank=True,null=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -35,6 +34,7 @@ class Direct(models.Model):
     created_at=models.DateTimeField(auto_now_add=True)
     is_readed=models.BooleanField(default=False)
     photo=models.ImageField(upload_to='direct/',blank=True,null=True)
+    voice = models.FileField(upload_to='voice/', blank=True, null=True)
 
     def __str__(self):
         return f'{self.sender.username}:{self.receiner.username}'

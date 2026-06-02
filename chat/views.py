@@ -83,15 +83,17 @@ def send_message(request,pk):
     if request.method == 'POST':
         text = request.POST.get("text", "").strip()
         photo = request.FILES.get("photo")
-
-        if text or photo:
+        voice = request.FILES.get("voice")
+    
+        if text or photo or voice:
             Direct.objects.create(
                 sender=request.user,
                 receiner=ptn,
                 text=text,
-                photo=photo
+                photo=photo,
+                voice=voice
             )
-
+    
         return redirect('send_message', ptn.pk)
 
     message=Direct.objects.filter(

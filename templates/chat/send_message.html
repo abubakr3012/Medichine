@@ -19,6 +19,7 @@
 </header>
 
 <ul class="chat-list dm-messages">
+
     {% for i in messages %}
         <li class="chat-message {% if i.sender == request.user %}msg-own{% else %}msg-other{% endif %}">
 
@@ -45,10 +46,14 @@
                 <div class="msg-bubble">
 
                     {% if i.photo %}
-                        <img
-                            src="{{ i.photo.url }}"
-                            alt=""
-                            style="max-width:250px;border-radius:10px;margin-bottom:10px;">
+                        <img src="{{ i.photo.url }}"
+                             style="max-width:250px;border-radius:10px;margin-bottom:10px;">
+                    {% endif %}
+
+                    {% if i.voice %}
+                        <audio controls>
+                            <source src="{{ i.voice.url }}">
+                        </audio>
                     {% endif %}
 
                     {% if i.text %}
@@ -57,54 +62,34 @@
 
                 </div>
 
-                <div class="msg-read">
-                    {% if i.is_readed %}
-                        Прочитано
-                    {% else %}
-                        Не прочитано
-                    {% endif %}
-                </div>
-
             </div>
 
         </li>
     {% empty %}
-        <p class="muted">Сообщений нет</p>
+        <p>Сообщений нет</p>
     {% endfor %}
+
 </ul>
 
 <form class="chat-form chat-form-inline"
-      action=""
       method="post"
       enctype="multipart/form-data">
 
     {% csrf_token %}
 
-    <input
-        class="chat-input"
-        type="text"
-        placeholder="Напишите сообщение..."
-        name="text">
+    <input class="chat-input"
+           type="text"
+           name="text"
+           placeholder="Напишите сообщение...">
 
-    <label for="photo-input" class="photo-btn">
-        📎
-    </label>
+    <!-- PHOTO -->
+    <label for="photo-input" class="photo-btn">📎</label>
+    <input id="photo-input" type="file" name="photo" hidden>
 
-    <input
-        id="photo-input"
-        type="file"
-        name="photo"
-        hidden>
-    <label for="voice-input">
-        🎤
-    </label>
-    
-    <input
-        id="voice-input"
-        type="file"
-        name="voice"
-        accept="audio/*"
-        hidden>
+    <!-- VOICE RECORD BUTTON -->
+    <label id="record-btn" class="photo-btn">🎤</label>
+    <input id="voice-input" type="file" name="voice" hidden>
+
     <button class="chat-send" type="submit">
         Отправить
     </button>
@@ -112,4 +97,57 @@
 </form>
 
 </section>
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+
+const recordBtn = document.getElementById("record-btn");
+
+recordBtn.addEventListener("click", async function (e) {
+    e.preventDefault();
+
+    if (!mediaRecorder || mediaRecorder.state === "inactive") {
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true
+        });
+
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = function(event) {
+            audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = function() {
+
+            const audioBlob = new Blob(audioChunks, {
+                type: "audio/webm"
+            });
+
+            const audioFile = new File(
+                [audioBlob],
+                "voice.webm",
+                { type: "audio/webm" }
+            );
+
+            const dt = new DataTransfer();
+            dt.items.add(audioFile);
+
+            const input = document.getElementById("voice-input");
+            input.files = dt.files;
+
+            recordBtn.textContent = "✅";
+        };
+
+        mediaRecorder.start();
+        recordBtn.textContent = "⏹";
+
+    } else {
+        mediaRecorder.stop();
+    }
+});
+</script>
+
 {% endblock %}
