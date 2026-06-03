@@ -136,8 +136,8 @@ function connectWS() {
 
         appendMessage({
             text: data.message,
-            photoUrl: null,
-            voiceUrl: null,
+            photoUrl: data.photo_url,
+            voiceUrl: data.voice_url,
             senderName: data.sender,
             isOwn: false,
         });
@@ -198,10 +198,21 @@ function updateFileLabel() {
     document.getElementById("file-label").textContent = parts.join("  ");
 }
 
+// ─── Конвертация файла в base64 ─────────────────────────────────────────────────────
+
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
 // ─── Отправка формы ────────────────────────────────────────────────────────────
 
 document.getElementById("chat-form").addEventListener("submit", async (e) => {
-    e.preventDefault();  // Всегда перехватываем — никакого page reload
+    e.preventDefault();
 
     const textInput  = document.getElementById("text-input");
     const photoInput = document.getElementById("photo-input");
@@ -212,33 +223,57 @@ document.getElementById("chat-form").addEventListener("submit", async (e) => {
     const hasVoice = voiceInput.files.length > 0;
     const hasFiles = hasPhoto || hasVoice;
 
-    if (!text && !hasFiles) return;  // Нечего отправлять
+    if (!text && !hasFiles) return;
 
-    if (hasFiles) {
-        // ── Путь 1: Фото или голос → fetch (AJAX multipart POST) ──────────────
-        // Страница НЕ перезагружается. Сервер сохраняет файл и возвращает JSON.
-        const btn = document.getElementById("send-btn");
-        btn.disabled = true;
-        btn.textContent = "⏳";
+    // Конвертируем файлы в base64
+    let photoBase64 = null;
+    let voiceBase64 = null;
 
+    if (hasPhoto) {
+        photoBase64 = await fileToBase64(photoInput.files[0]);
+    }
+    if (hasVoice) {
+        voiceBase64 = await fileToBase64(voiceInput.files[0]);
+    }
+
+    // Отправляем через WebSocket
+    if (wsOpen && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+            message: text,
+            sender: "{{ request.user.id }}",
+            receiver: "{{ profile.id }}",
+            photo: photoBase64,
+            voice: voiceBase64,
+        }));
+
+        // Оптимистично показываем своё сообщение
+        appendMessage({
+            text,
+            photoUrl: hasPhoto ? URL.createObjectURL(photoInput.files[0]) : null,
+            voiceUrl: hasVoice ? URL.createObjectURL(voiceInput.files[0]) : null,
+            senderName: "Вы",
+            isOwn: true,
+        });
+
+        // Очищаем форму
+        textInput.value = "";
+        photoInput.value = "";
+        voiceInput.value = "";
+        recordBtn.textContent = "🎤";
+        document.getElementById("file-label").textContent = "";
+
+    } else {
+        // Fallback: если WebSocket недоступен
         const formData = new FormData();
         formData.append("csrfmiddlewaretoken", document.querySelector("[name=csrfmiddlewaretoken]").value);
-        if (text)       formData.append("text", text);
-        if (hasPhoto)   formData.append("photo", photoInput.files[0]);
-        if (hasVoice)   formData.append("voice", voiceInput.files[0]);
+        if (text) formData.append("text", text);
+        if (hasPhoto) formData.append("photo", photoInput.files[0]);
+        if (hasVoice) formData.append("voice", voiceInput.files[0]);
 
         try {
-            const resp = await fetch(window.location.href, {
-                method: "POST",
-                body: formData,
-            });
-
-            if (!resp.ok) throw new Error("Ошибка сервера: " + resp.status);
-
+            const resp = await fetch(window.location.href, { method: "POST", body: formData });
             const data = await resp.json();
-
             if (data.ok) {
-                // Добавляем сообщение в DOM сразу
                 appendMessage({
                     text: data.text,
                     photoUrl: data.photo_url,
@@ -246,8 +281,6 @@ document.getElementById("chat-form").addEventListener("submit", async (e) => {
                     senderName: "Вы",
                     isOwn: true,
                 });
-
-                // Очищаем форму
                 textInput.value = "";
                 photoInput.value = "";
                 voiceInput.value = "";
@@ -255,42 +288,7 @@ document.getElementById("chat-form").addEventListener("submit", async (e) => {
                 document.getElementById("file-label").textContent = "";
             }
         } catch (err) {
-            alert("Не удалось отправить файл: " + err.message);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = "Отправить";
-        }
-
-    } else {
-        // ── Путь 2: Только текст → WebSocket (мгновенно, без сервера) ─────────
-        // consumers.py получает сообщение и сохраняет его в БД.
-        if (wsOpen && socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({
-                message: text,
-                sender: "{{ request.user.id }}",
-                receiver: "{{ profile.id }}",
-            }));
-
-            // Оптимистично показываем своё сообщение сразу
-            appendMessage({ text, photoUrl: null, voiceUrl: null, senderName: "Вы", isOwn: true });
-            textInput.value = "";
-
-        } else {
-            // WS недоступен → fallback: fetch POST с текстом
-            const formData = new FormData();
-            formData.append("csrfmiddlewaretoken", document.querySelector("[name=csrfmiddlewaretoken]").value);
-            formData.append("text", text);
-
-            try {
-                const resp = await fetch(window.location.href, { method: "POST", body: formData });
-                const data = await resp.json();
-                if (data.ok) {
-                    appendMessage({ text: data.text, photoUrl: null, voiceUrl: null, senderName: "Вы", isOwn: true });
-                    textInput.value = "";
-                }
-            } catch (err) {
-                alert("Не удалось отправить: " + err.message);
-            }
+            alert("Не удалось отправить: " + err.message);
         }
     }
 });
