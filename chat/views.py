@@ -54,7 +54,6 @@ class MessageDeleteView(LoginRequiredMixin, generic.DeleteView):
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-        # Только автор может удалить своё сообщение
         if obj.user != self.request.user:
             from django.core.exceptions import PermissionDenied
             raise PermissionDenied
@@ -90,13 +89,11 @@ def send_message(request, pk):
         photo = request.FILES.get("photo")
         voice = request.FILES.get("voice")
 
-        # Создаём сообщение только если есть хоть что-то:
-        # текст, фото или голос
         if text or photo or voice:
             Direct.objects.create(
                 sender=request.user,
                 receiner=ptn,
-                text=text,       # blank=True в модели, пустая строка допустима
+                text=text,       
                 photo=photo,
                 voice=voice,
             )
@@ -111,7 +108,6 @@ def send_message(request, pk):
         "sender__profile", "receiner__profile"
     ).order_by("created_at")
 
-    # Помечаем входящие как прочитанные
     messages.filter(receiner=request.user, is_readed=False).update(is_readed=True)
 
     return render(request, 'chat/send_message.html', {
