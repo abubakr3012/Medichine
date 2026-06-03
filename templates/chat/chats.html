@@ -15,7 +15,7 @@
                 <a href="{% url 'profile' i.user.username %}"><b>{{ i.user.username }}</b></a>
             </div>
             <p>{{ i.text }}</p>
-            <p class="likes">❤️ {{ i.likes.count }} · 👎 {{ i.dizlikes.count }}</p>
+            <p class="likes">👍🏻 {{ i.likes.count }} · 👎🏻 {{ i.dizlikes.count }}</p>
             <div class="chat-actions">
                 <a href="{% url 'like' i.id %}"><img src="/media/like.png" alt="Лайк"></a>
                 <a href="{% url 'dizlike' i.id %}"><img src="/media/dizlike.png" alt="Дизлайк"></a>
