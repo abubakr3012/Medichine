@@ -181,6 +181,26 @@
     border-radius: 3px;
 }
 
+.dm-messages .chat-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin-bottom: 16px;
+}
+
+.dm-messages .chat-message.msg-own {
+    flex-direction: row-reverse;
+}
+
+.dm-messages .chat-message.msg-own .msg-body {
+    text-align: right;
+}
+
 .dm-messages .msg-avatar {
     flex: 0 0 auto;
     width: 40px;
@@ -199,7 +219,7 @@
 
 .dm-messages .msg-bubble {
     display: inline-block;
-    max-width: 100%;
+    max-width: 70%;
     padding: 10px 14px;
     color: #111b21;
     background: white;
