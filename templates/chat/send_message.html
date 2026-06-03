@@ -10,9 +10,14 @@
         <p class="eyebrow">Direct message</p>
         <h1>Чат с {{ profile.username }}</h1>
     </div>
-    <a class="button secondary-button" href="{% url 'show_messages' %}">
-        Все сообщения
-    </a>
+    <div class="header-actions">
+        <a class="button secondary-button" href="{% url 'start_video_call' profile.id %}">
+            📹 Видеозвонок
+        </a>
+        <a class="button secondary-button" href="{% url 'show_messages' %}">
+            Все сообщения
+        </a>
+    </div>
 </header>
 
 <ul class="chat-list dm-messages" id="chat-list">

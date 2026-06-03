@@ -40,3 +40,26 @@ class Direct(models.Model):
 
     def __str__(self):
         return f'{self.sender.username}:{self.receiner.username}'
+
+
+class Call(models.Model):
+    CALL_TYPE_CHOICES = [
+        ('video', 'Video Call'),
+        ('audio', 'Audio Call'),
+    ]
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+        ('ended', 'Ended'),
+    ]
+    
+    caller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='initiated_calls')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_calls')
+    call_type = models.CharField(max_length=10, choices=CALL_TYPE_CHOICES, default='video')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.call_type} call: {self.caller.username} -> {self.receiver.username}'

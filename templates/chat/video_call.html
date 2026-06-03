@@ -1,0 +1,307 @@
+{% extends "accounts/base.html" %}
+
+{% block title %}Видеозвонок{% endblock %}
+
+{% block main %}
+<section class="page video-call-page">
+    <header class="page-head compact-head">
+        <div>
+            <p class="eyebrow">Видеозвонок</p>
+            <h1>
+                {% if is_caller %}
+                    Звонок {{ call.receiver.username }}
+                {% else %}
+                    Звонок от {{ call.caller.username }}
+                {% endif %}
+            </h1>
+        </div>
+        <a class="button secondary-button" href="{% url 'show_messages' %}">
+            Завершить
+        </a>
+    </header>
+
+    <div class="video-container">
+        <video id="localVideo" autoplay muted playsinline></video>
+        <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+
+    <div class="call-controls">
+        <button id="muteBtn" class="control-btn">🎤</button>
+        <button id="videoBtn" class="control-btn">📹</button>
+        <button id="endCallBtn" class="control-btn end-call">📞</button>
+    </div>
+
+    <div id="status" class="call-status">
+        {% if is_caller %}
+            Ожидание ответа...
+        {% else %}
+            Входящий звонок...
+        {% endif %}
+    </div>
+</section>
+
+<style>
+.video-call-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+#localVideo {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 200px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid white;
+    z-index: 10;
+}
+
+#remoteVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.call-controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.control-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    background: #4a90e2;
+    color: white;
+    transition: all 0.3s;
+}
+
+.control-btn:hover {
+    transform: scale(1.1);
+}
+
+.control-btn.end-call {
+    background: #e74c3c;
+}
+
+.call-status {
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+    margin-top: 20px;
+}
+</style>
+
+<script>
+const localVideo = document.getElementById('localVideo');
+const remoteVideo = document.getElementById('remoteVideo');
+const statusDiv = document.getElementById('status');
+const muteBtn = document.getElementById('muteBtn');
+const videoBtn = document.getElementById('videoBtn');
+const endCallBtn = document.getElementById('endCallBtn');
+
+let localStream;
+let remoteStream;
+let peerConnection;
+let isCaller = {{ is_caller|lower }};
+let callId = {{ call.id }};
+
+// STUN серверы для NAT traversal
+const rtcConfig = {
+    iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+    ]
+};
+
+// WebSocket соединение для signaling
+const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+const ws = new WebSocket(`${wsScheme}://${window.location.host}/ws/call/${callId}/`);
+
+ws.onopen = () => {
+    console.log('WebSocket connected');
+    if (isCaller) {
+        startCall();
+    }
+};
+
+ws.onmessage = async (event) => {
+    const data = JSON.parse(event.data);
+    
+    switch (data.type) {
+        case 'offer':
+            await handleOffer(data.offer);
+            break;
+        case 'answer':
+            await handleAnswer(data.answer);
+            break;
+        case 'ice_candidate':
+            await handleIceCandidate(data.candidate);
+            break;
+        case 'end_call':
+            endCall();
+            break;
+    }
+};
+
+async function startCall() {
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
+        });
+        localVideo.srcObject = localStream;
+        
+        peerConnection = new RTCPeerConnection(rtcConfig);
+        
+        localStream.getTracks().forEach(track => {
+            peerConnection.addTrack(track, localStream);
+        });
+        
+        peerConnection.ontrack = (event) => {
+            remoteVideo.srcObject = event.streams[0];
+        };
+        
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                ws.send(JSON.stringify({
+                    type: 'ice_candidate',
+                    candidate: event.candidate
+                }));
+            }
+        };
+        
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        
+        ws.send(JSON.stringify({
+            type: 'offer',
+            offer: offer
+        }));
+        
+        statusDiv.textContent = 'Ожидание ответа...';
+    } catch (error) {
+        console.error('Error starting call:', error);
+        statusDiv.textContent = 'Ошибка: ' + error.message;
+    }
+}
+
+async function handleOffer(offer) {
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
+        });
+        localVideo.srcObject = localStream;
+        
+        peerConnection = new RTCPeerConnection(rtcConfig);
+        
+        localStream.getTracks().forEach(track => {
+            peerConnection.addTrack(track, localStream);
+        });
+        
+        peerConnection.ontrack = (event) => {
+            remoteVideo.srcObject = event.streams[0];
+        };
+        
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                ws.send(JSON.stringify({
+                    type: 'ice_candidate',
+                    candidate: event.candidate
+                }));
+            }
+        };
+        
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        
+        ws.send(JSON.stringify({
+            type: 'answer',
+            answer: answer
+        }));
+        
+        statusDiv.textContent = 'Соединение установлено';
+    } catch (error) {
+        console.error('Error handling offer:', error);
+        statusDiv.textContent = 'Ошибка: ' + error.message;
+    }
+}
+
+async function handleAnswer(answer) {
+    try {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+        statusDiv.textContent = 'Соединение установлено';
+    } catch (error) {
+        console.error('Error handling answer:', error);
+    }
+}
+
+async function handleIceCandidate(candidate) {
+    try {
+        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+    } catch (error) {
+        console.error('Error adding ICE candidate:', error);
+    }
+}
+
+function endCall() {
+    if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+    }
+    if (peerConnection) {
+        peerConnection.close();
+    }
+    ws.send(JSON.stringify({ type: 'end_call' }));
+    ws.close();
+    window.location.href = "{% url 'show_messages' %}";
+}
+
+// Управление микрофоном
+muteBtn.addEventListener('click', () => {
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        muteBtn.textContent = audioTrack.enabled ? '🎤' : '🔇';
+    }
+});
+
+// Управление камерой
+videoBtn.addEventListener('click', () => {
+    const videoTrack = localStream.getVideoTracks()[0];
+    if (videoTrack) {
+        videoTrack.enabled = !videoTrack.enabled;
+        videoBtn.textContent = videoTrack.enabled ? '📹' : '📷';
+    }
+});
+
+// Завершение звонка
+endCallBtn.addEventListener('click', endCall);
+
+// Закрытие страницы
+window.addEventListener('beforeunload', () => {
+    endCall();
+});
+</script>
+
+{% endblock %}

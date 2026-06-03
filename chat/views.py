@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Message, Direct
+from .models import Message, Direct, Call
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -153,3 +153,44 @@ def delete_chat(request, pk):
         Q(sender=other_user, receiner=request.user)
     ).delete()
     return redirect('show_messages')
+
+
+@login_required(login_url='login')
+def start_video_call(request, user_id):
+    receiver = get_object_or_404(User, pk=user_id)
+    
+    if receiver == request.user:
+        return redirect('show_messages')
+    
+    # Создаем новый вызов
+    call = Call.objects.create(
+        caller=request.user,
+        receiver=receiver,
+        call_type='video',
+        status='pending'
+    )
+    
+    return redirect('video_call', call_id=call.id)
+
+
+@login_required(login_url='login')
+def video_call(request, call_id):
+    call = get_object_or_404(Call, pk=call_id)
+    
+    # Проверяем, что пользователь участвует в вызове
+    if call.caller != request.user and call.receiver != request.user:
+        return redirect('show_messages')
+    
+    # Если вызов уже завершен, перенаправляем
+    if call.status == 'ended':
+        return redirect('show_messages')
+    
+    # Если пользователь - получатель и вызов в ожидании, принимаем его
+    if call.receiver == request.user and call.status == 'pending':
+        call.status = 'accepted'
+        call.save()
+    
+    return render(request, 'chat/video_call.html', {
+        'call': call,
+        'is_caller': call.caller == request.user,
+    })

@@ -3,7 +3,7 @@ import base64
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.core.files.base import ContentFile
-from .models import Direct
+from .models import Direct, Call
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -39,9 +39,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         receiver_id = text_data_json.get("receiver")
         photo_base64 = text_data_json.get("photo")
         voice_base64 = text_data_json.get("voice")
+        call_notification = text_data_json.get("call_notification")
 
         user = self.scope.get("user")
         if not (user and user.is_authenticated):
+            return
+
+        # Обработка уведомления о звонке
+        if call_notification:
+            await self.handle_call_notification(call_notification)
             return
 
         if not message_text and not photo_base64 and not voice_base64:
@@ -99,6 +105,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "voice_url": saved.voice.url if saved.voice else None,
             },
         )
+
+    async def handle_call_notification(self, call_data):
+        """Обрабатывает уведомление о входящем звонке"""
+        call_id = call_data.get("call_id")
+        caller_id = call_data.get("caller_id")
+        caller_name = call_data.get("caller_name")
+        
+        # Отправляем уведомление о звонке
+        await self.send(text_data=json.dumps({
+            "type": "incoming_call",
+            "call_id": call_id,
+            "caller_id": caller_id,
+            "caller_name": caller_name,
+        }))
 
     async def direct_message(self, event):
         await self.send(text_data=json.dumps({
