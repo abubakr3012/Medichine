@@ -1190,23 +1190,22 @@ button:active, .button:active {
 .dm-messages .msg-bubble {
     display: inline-block;
     max-width: 100%;
-    padding: 0.9rem 1.1rem;
+    padding: 12px 16px;
     color: var(--text);
     background: var(--surface);
-    backdrop-filter: blur(15px);
     border: 1px solid var(--line);
-    border-radius: 0 18px 18px 18px;
+    border-radius: 0 16px 16px 16px;
     font-size: 0.94rem;
     animation: bubbleIn 0.3s var(--ease-spring) both;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .dm-messages .chat-message.msg-own .msg-bubble {
     color: #fff;
     background: var(--primary);
     border-color: transparent;
-    border-radius: 18px 0 18px 18px;
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    border-radius: 16px 0 16px 16px;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.25);
 }
 
 .dm-list { max-width: 860px; padding: 0.4rem; }
