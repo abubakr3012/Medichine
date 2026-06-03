@@ -1090,16 +1090,15 @@ button:active, .button:active {
     margin-bottom: 0.9rem;
     padding: 1.4rem 1.6rem;
     background: var(--surface);
-    backdrop-filter: blur(15px);
     border: 1px solid var(--line);
-    border-radius: 18px;
+    border-radius: 16px;
     transition: all var(--t) var(--ease-spring);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .chat-message:hover {
     border-color: var(--line-2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
     transform: translateY(-2px);
 }
 
@@ -1112,7 +1111,7 @@ button:active, .button:active {
     border: 3px solid var(--surface);
     object-fit: cover;
     background: var(--primary-light);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .chat-message .meta { margin-bottom: 0.3rem; overflow: hidden; }
