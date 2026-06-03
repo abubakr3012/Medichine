@@ -1,8 +1,6 @@
 {% extends "accounts/base.html" %}
 
-{% block title %}
-Чат с {{ profile.username }}
-{% endblock %}
+{% block title %}Чат с {{ profile.username }}{% endblock %}
 
 {% block main %}
 <section class="page chat-page">
@@ -12,184 +10,293 @@
         <p class="eyebrow">Direct message</p>
         <h1>Чат с {{ profile.username }}</h1>
     </div>
-
     <a class="button secondary-button" href="{% url 'show_messages' %}">
         Все сообщения
     </a>
 </header>
 
 <ul class="chat-list dm-messages" id="chat-list">
-
     {% for i in messages %}
         <li class="chat-message {% if i.sender == request.user %}msg-own{% else %}msg-other{% endif %}">
-
             <div class="msg-avatar">
                 {% if i.sender.profile.photo %}
-                    <img src="{{ i.sender.profile.photo.url }}">
+                    <img src="{{ i.sender.profile.photo.url }}" alt="">
                 {% else %}
-                    <img src="/media/user.png">
+                    <img src="/media/user.png" alt="">
                 {% endif %}
             </div>
-
             <div class="msg-body">
-
                 <div class="msg-meta">
-                    <b>
-                        {% if i.sender == request.user %}
-                            Вы
-                        {% else %}
-                            {{ i.sender.username }}
-                        {% endif %}
-                    </b>
+                    <b>{% if i.sender == request.user %}Вы{% else %}{{ i.sender.username }}{% endif %}</b>
                 </div>
-
                 <div class="msg-bubble">
-
                     {% if i.photo %}
-                        <img src="{{ i.photo.url }}"
-                             style="max-width:250px;border-radius:10px;margin-bottom:10px;">
+                        <img src="{{ i.photo.url }}" style="max-width:250px;border-radius:10px;margin-bottom:8px;" alt="фото">
                     {% endif %}
-
                     {% if i.voice %}
-                        <audio controls>
+                        <audio controls style="display:block;margin-bottom:6px;">
                             <source src="{{ i.voice.url }}">
                         </audio>
                     {% endif %}
-
                     {% if i.text %}
                         <p>{{ i.text }}</p>
                     {% endif %}
-
                 </div>
-
             </div>
-
         </li>
     {% empty %}
-        <p>Сообщений нет</p>
+        <p class="muted">Сообщений нет</p>
     {% endfor %}
-
 </ul>
 
-<form class="chat-form chat-form-inline"
-      method="post"
-      enctype="multipart/form-data">
-
+<form class="chat-form chat-form-inline" id="chat-form" enctype="multipart/form-data">
     {% csrf_token %}
 
-    <input class="chat-input"
-           type="text"
-           name="text"
-           placeholder="Напишите сообщение...">
+    <input class="chat-input" type="text" name="text" id="text-input"
+           placeholder="Напишите сообщение..." autocomplete="off">
 
-    <!-- PHOTO -->
-    <label for="photo-input" class="photo-btn">📎</label>
-    <input id="photo-input" type="file" name="photo" hidden>
+    <label for="photo-input" class="photo-btn" title="Прикрепить фото">📎</label>
+    <input id="photo-input" type="file" name="photo" accept="image/*" hidden>
 
-    <!-- VOICE -->
-    <label id="record-btn" class="photo-btn">🎤</label>
+    <label id="record-btn" class="photo-btn" title="Записать голосовое">🎤</label>
     <input id="voice-input" type="file" name="voice" hidden>
 
-    <button class="chat-send" type="submit">
-        Отправить
-    </button>
+    <span id="file-label" style="font-size:0.82em;color:#888;"></span>
 
+    <button class="chat-send" type="submit" id="send-btn">Отправить</button>
 </form>
 
 </section>
 
-<!-- 🎤 VOICE RECORD -->
 <script>
-let mediaRecorder;
-let audioChunks = [];
+// ─── Утилиты ──────────────────────────────────────────────────────────────────
 
+function esc(str) {
+    return String(str || "")
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function scrollDown() {
+    const list = document.getElementById("chat-list");
+    list.scrollTop = list.scrollHeight;
+}
+
+/**
+ * Добавляет сообщение в DOM.
+ * @param {Object} opts - { text, photoUrl, voiceUrl, senderName, isOwn }
+ */
+function appendMessage({ text, photoUrl, voiceUrl, senderName, isOwn }) {
+    const list = document.getElementById("chat-list");
+
+    // Удаляем "Сообщений нет" если есть
+    const empty = list.querySelector(".muted");
+    if (empty) empty.remove();
+
+    let bubbleHTML = "";
+    if (photoUrl) {
+        bubbleHTML += `<img src="${esc(photoUrl)}" style="max-width:250px;border-radius:10px;margin-bottom:8px;" alt="фото">`;
+    }
+    if (voiceUrl) {
+        bubbleHTML += `<audio controls style="display:block;margin-bottom:6px;"><source src="${esc(voiceUrl)}"></audio>`;
+    }
+    if (text) {
+        bubbleHTML += `<p>${esc(text)}</p>`;
+    }
+
+    const li = document.createElement("li");
+    li.className = `chat-message ${isOwn ? "msg-own" : "msg-other"}`;
+    li.innerHTML = `
+        <div class="msg-body">
+            <div class="msg-meta"><b>${isOwn ? "Вы" : esc(senderName)}</b></div>
+            <div class="msg-bubble">${bubbleHTML}</div>
+        </div>
+    `;
+    list.appendChild(li);
+    scrollDown();
+}
+
+// ─── WebSocket ─────────────────────────────────────────────────────────────────
+
+const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+let socket = null;
+let wsOpen = false;
+
+function connectWS() {
+    socket = new WebSocket(`${wsScheme}://${window.location.host}/ws/chat/{{ profile.id }}/`);
+
+    socket.onopen = () => { wsOpen = true; };
+    socket.onclose = () => { wsOpen = false; setTimeout(connectWS, 3000); };
+    socket.onerror = () => { wsOpen = false; };
+
+    socket.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        // Игнорируем своё эхо — своё уже добавлено оптимистично
+        if (String(data.sender_id) === "{{ request.user.id }}") return;
+
+        appendMessage({
+            text: data.message,
+            photoUrl: null,
+            voiceUrl: null,
+            senderName: data.sender,
+            isOwn: false,
+        });
+    };
+}
+
+connectWS();
+
+// ─── Голосовая запись ─────────────────────────────────────────────────────────
+
+let mediaRecorder = null;
+let audioChunks = [];
 const recordBtn = document.getElementById("record-btn");
 
-recordBtn.addEventListener("click", async function (e) {
+recordBtn.addEventListener("click", async (e) => {
     e.preventDefault();
 
     if (!mediaRecorder || mediaRecorder.state === "inactive") {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
 
-        const stream = await navigator.mediaDevices.getUserMedia({
-            audio: true
-        });
+            mediaRecorder.ondataavailable = (ev) => {
+                if (ev.data.size > 0) audioChunks.push(ev.data);
+            };
 
-        mediaRecorder = new MediaRecorder(stream);
-        audioChunks = [];
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(audioChunks, { type: "audio/webm" });
+                const file = new File([blob], "voice.webm", { type: "audio/webm" });
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                document.getElementById("voice-input").files = dt.files;
+                recordBtn.textContent = "✅";
+                updateFileLabel();
+                // Остановка треков — освобождаем микрофон
+                stream.getTracks().forEach(t => t.stop());
+            };
 
-        mediaRecorder.ondataavailable = function(event) {
-            audioChunks.push(event.data);
-        };
-
-        mediaRecorder.onstop = function() {
-
-            const audioBlob = new Blob(audioChunks, {
-                type: "audio/webm"
-            });
-
-            const audioFile = new File(
-                [audioBlob],
-                "voice.webm",
-                { type: "audio/webm" }
-            );
-
-            const dt = new DataTransfer();
-            dt.items.add(audioFile);
-
-            document.getElementById("voice-input").files = dt.files;
-
-            recordBtn.textContent = "✅";
-        };
-
-        mediaRecorder.start();
-        recordBtn.textContent = "⏹";
-
-    } else {
+            mediaRecorder.start();
+            recordBtn.textContent = "⏹";
+        } catch (err) {
+            alert("Нет доступа к микрофону: " + err.message);
+        }
+    } else if (mediaRecorder.state === "recording") {
         mediaRecorder.stop();
     }
 });
-</script>
 
-<!-- ⚡ WEB SOCKET -->
-<script>
-const chatSocket = new WebSocket(
-    'ws://' + window.location.host + '/ws/chat/{{ profile.id }}/'
-);
+document.getElementById("photo-input").addEventListener("change", updateFileLabel);
 
-chatSocket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
+function updateFileLabel() {
+    const photo = document.getElementById("photo-input").files;
+    const voice = document.getElementById("voice-input").files;
+    const parts = [];
+    if (photo.length) parts.push("📎 " + photo[0].name);
+    if (voice.length) parts.push("🎤 голос");
+    document.getElementById("file-label").textContent = parts.join("  ");
+}
 
-    const chatList = document.getElementById("chat-list");
+// ─── Отправка формы ────────────────────────────────────────────────────────────
 
-    chatList.innerHTML += `
-        <li class="chat-message msg-other">
-            <div class="msg-body">
-                <div class="msg-meta">
-                    <b>${data.sender}</b>
-                </div>
-                <div class="msg-bubble">
-                    <p>${data.message}</p>
-                </div>
-            </div>
-        </li>
-    `;
+document.getElementById("chat-form").addEventListener("submit", async (e) => {
+    e.preventDefault();  // Всегда перехватываем — никакого page reload
 
-    chatList.scrollTop = chatList.scrollHeight;
-};
+    const textInput  = document.getElementById("text-input");
+    const photoInput = document.getElementById("photo-input");
+    const voiceInput = document.getElementById("voice-input");
 
-document.querySelector("form").addEventListener("submit", function(e) {
-    e.preventDefault();
+    const text     = textInput.value.trim();
+    const hasPhoto = photoInput.files.length > 0;
+    const hasVoice = voiceInput.files.length > 0;
+    const hasFiles = hasPhoto || hasVoice;
 
-    const textInput = document.querySelector("input[name='text']");
+    if (!text && !hasFiles) return;  // Нечего отправлять
 
-    chatSocket.send(JSON.stringify({
-        message: textInput.value,
-        sender: "{{ request.user.id }}",
-        receiver: "{{ profile.id }}"
-    }));
+    if (hasFiles) {
+        // ── Путь 1: Фото или голос → fetch (AJAX multipart POST) ──────────────
+        // Страница НЕ перезагружается. Сервер сохраняет файл и возвращает JSON.
+        const btn = document.getElementById("send-btn");
+        btn.disabled = true;
+        btn.textContent = "⏳";
 
-    textInput.value = "";
+        const formData = new FormData();
+        formData.append("csrfmiddlewaretoken", document.querySelector("[name=csrfmiddlewaretoken]").value);
+        if (text)       formData.append("text", text);
+        if (hasPhoto)   formData.append("photo", photoInput.files[0]);
+        if (hasVoice)   formData.append("voice", voiceInput.files[0]);
+
+        try {
+            const resp = await fetch(window.location.href, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!resp.ok) throw new Error("Ошибка сервера: " + resp.status);
+
+            const data = await resp.json();
+
+            if (data.ok) {
+                // Добавляем сообщение в DOM сразу
+                appendMessage({
+                    text: data.text,
+                    photoUrl: data.photo_url,
+                    voiceUrl: data.voice_url,
+                    senderName: "Вы",
+                    isOwn: true,
+                });
+
+                // Очищаем форму
+                textInput.value = "";
+                photoInput.value = "";
+                voiceInput.value = "";
+                recordBtn.textContent = "🎤";
+                document.getElementById("file-label").textContent = "";
+            }
+        } catch (err) {
+            alert("Не удалось отправить файл: " + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Отправить";
+        }
+
+    } else {
+        // ── Путь 2: Только текст → WebSocket (мгновенно, без сервера) ─────────
+        // consumers.py получает сообщение и сохраняет его в БД.
+        if (wsOpen && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({
+                message: text,
+                sender: "{{ request.user.id }}",
+                receiver: "{{ profile.id }}",
+            }));
+
+            // Оптимистично показываем своё сообщение сразу
+            appendMessage({ text, photoUrl: null, voiceUrl: null, senderName: "Вы", isOwn: true });
+            textInput.value = "";
+
+        } else {
+            // WS недоступен → fallback: fetch POST с текстом
+            const formData = new FormData();
+            formData.append("csrfmiddlewaretoken", document.querySelector("[name=csrfmiddlewaretoken]").value);
+            formData.append("text", text);
+
+            try {
+                const resp = await fetch(window.location.href, { method: "POST", body: formData });
+                const data = await resp.json();
+                if (data.ok) {
+                    appendMessage({ text: data.text, photoUrl: null, voiceUrl: null, senderName: "Вы", isOwn: true });
+                    textInput.value = "";
+                }
+            } catch (err) {
+                alert("Не удалось отправить: " + err.message);
+            }
+        }
+    }
 });
+
+// ─── Скролл при загрузке ───────────────────────────────────────────────────────
+window.addEventListener("load", scrollDown);
 </script>
 
 {% endblock %}
