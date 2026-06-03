@@ -42,72 +42,142 @@
 
 <style>
 .video-call-page {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 24px;
 }
 
 .video-container {
     position: relative;
     width: 100%;
-    max-width: 800px;
-    margin: 20px auto;
+    max-width: 900px;
+    margin: 24px auto;
     aspect-ratio: 16/9;
-    background: #000;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 16px;
     overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 #localVideo {
     position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 200px;
-    height: 150px;
+    bottom: 24px;
+    right: 24px;
+    width: 240px;
+    height: 180px;
     object-fit: cover;
-    border-radius: 8px;
-    border: 2px solid white;
+    border-radius: 12px;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     z-index: 10;
+    transition: all 0.3s ease;
+}
+
+#localVideo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
 }
 
 #remoteVideo {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    background: #0f0f23;
 }
 
 .call-controls {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    margin: 20px 0;
+    align-items: center;
+    gap: 16px;
+    margin: 32px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .control-btn {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     border: none;
-    font-size: 24px;
+    font-size: 22px;
     cursor: pointer;
-    background: #4a90e2;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    transition: all 0.3s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .control-btn:hover {
-    transform: scale(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.control-btn:active {
+    transform: translateY(0);
 }
 
 .control-btn.end-call {
-    background: #e74c3c;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+}
+
+.control-btn.end-call:hover {
+    box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+}
+
+.control-btn.active {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
 
 .call-status {
     text-align: center;
-    font-size: 18px;
-    color: #666;
-    margin-top: 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #667eea;
+    margin-top: 24px;
+    padding: 12px 24px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+    display: inline-block;
+    backdrop-filter: blur(5px);
+}
+
+@media (max-width: 768px) {
+    .video-call-page {
+        padding: 16px;
+    }
+
+    .video-container {
+        margin: 16px auto;
+        border-radius: 12px;
+    }
+
+    #localVideo {
+        width: 140px;
+        height: 105px;
+        bottom: 16px;
+        right: 16px;
+    }
+
+    .call-controls {
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .control-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
 }
 </style>
 
@@ -125,7 +195,6 @@ let peerConnection;
 let isCaller = {{ is_caller|lower }};
 let callId = {{ call.id }};
 
-// STUN серверы для NAT traversal
 const rtcConfig = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
@@ -133,12 +202,10 @@ const rtcConfig = {
     ]
 };
 
-// WebSocket соединение для signaling
 const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
 const ws = new WebSocket(`${wsScheme}://${window.location.host}/ws/call/${callId}/`);
 
 ws.onopen = () => {
-    console.log('WebSocket connected');
     if (isCaller) {
         startCall();
     }
@@ -200,7 +267,6 @@ async function startCall() {
         
         statusDiv.textContent = 'Ожидание ответа...';
     } catch (error) {
-        console.error('Error starting call:', error);
         statusDiv.textContent = 'Ошибка: ' + error.message;
     }
 }
@@ -243,7 +309,6 @@ async function handleOffer(offer) {
         
         statusDiv.textContent = 'Соединение установлено';
     } catch (error) {
-        console.error('Error handling offer:', error);
         statusDiv.textContent = 'Ошибка: ' + error.message;
     }
 }
@@ -253,7 +318,6 @@ async function handleAnswer(answer) {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
         statusDiv.textContent = 'Соединение установлено';
     } catch (error) {
-        console.error('Error handling answer:', error);
     }
 }
 
@@ -261,7 +325,6 @@ async function handleIceCandidate(candidate) {
     try {
         await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
     } catch (error) {
-        console.error('Error adding ICE candidate:', error);
     }
 }
 
@@ -277,28 +340,26 @@ function endCall() {
     window.location.href = "{% url 'show_messages' %}";
 }
 
-// Управление микрофоном
 muteBtn.addEventListener('click', () => {
     const audioTrack = localStream.getAudioTracks()[0];
     if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
         muteBtn.textContent = audioTrack.enabled ? '🎤' : '🔇';
+        muteBtn.classList.toggle('active', !audioTrack.enabled);
     }
 });
 
-// Управление камерой
 videoBtn.addEventListener('click', () => {
     const videoTrack = localStream.getVideoTracks()[0];
     if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
         videoBtn.textContent = videoTrack.enabled ? '📹' : '📷';
+        videoBtn.classList.toggle('active', !videoTrack.enabled);
     }
 });
 
-// Завершение звонка
 endCallBtn.addEventListener('click', endCall);
 
-// Закрытие страницы
 window.addEventListener('beforeunload', () => {
     endCall();
 });
