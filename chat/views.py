@@ -157,6 +157,9 @@ def delete_chat(request, pk):
 
 @login_required(login_url='login')
 def start_video_call(request, user_id):
+    from channels.layers import get_channel_layer
+    from asgiref.sync import async_to_sync
+    
     receiver = get_object_or_404(User, pk=user_id)
     
     if receiver == request.user:
@@ -168,6 +171,18 @@ def start_video_call(request, user_id):
         receiver=receiver,
         call_type='video',
         status='pending'
+    )
+    
+    # Отправляем уведомление через WebSocket получателю
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f"notifications_{receiver.id}",
+        {
+            "type": "call_notification",
+            "call_id": call.id,
+            "caller_id": request.user.id,
+            "caller_name": request.user.username,
+        }
     )
     
     return redirect('video_call', call_id=call.id)

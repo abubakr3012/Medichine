@@ -85,6 +85,108 @@
             render();
         })();
     </script>
+    {% if user.is_authenticated %}
+    <script>
+        // WebSocket для глобальных уведомлений
+        const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+        const notificationSocket = new WebSocket(`${wsScheme}://${window.location.host}/ws/notifications/`);
+
+        notificationSocket.onmessage = (e) => {
+            const data = JSON.parse(e.data);
+            
+            if (data.type === "incoming_call") {
+                showIncomingCall(data);
+            }
+        };
+
+        function showIncomingCall(data) {
+            // Создаем модальное окно для входящего звонка
+            const modal = document.createElement("div");
+            modal.className = "incoming-call-modal";
+            modal.innerHTML = `
+                <div class="incoming-call-content">
+                    <h2>📹 Входящий видеозвонок</h2>
+                    <p>${data.caller_name} вызывает вас</p>
+                    <div class="call-buttons">
+                        <button class="accept-btn" onclick="acceptCall(${data.call_id})">✅ Принять</button>
+                        <button class="reject-btn" onclick="rejectCall()">❌ Отклонить</button>
+                    </div>
+                </div>
+            `;
+            
+            // Добавляем стили если еще не добавлены
+            if (!document.getElementById("incoming-call-styles")) {
+                const style = document.createElement("style");
+                style.id = "incoming-call-styles";
+                style.textContent = `
+                    .incoming-call-modal {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.7);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 10000;
+                    }
+                    .incoming-call-content {
+                        background: white;
+                        padding: 30px;
+                        border-radius: 12px;
+                        text-align: center;
+                        max-width: 400px;
+                    }
+                    .incoming-call-content h2 {
+                        margin: 0 0 10px 0;
+                    }
+                    .incoming-call-content p {
+                        font-size: 18px;
+                        margin: 0 0 20px 0;
+                    }
+                    .call-buttons {
+                        display: flex;
+                        gap: 15px;
+                        justify-content: center;
+                    }
+                    .call-buttons button {
+                        padding: 12px 24px;
+                        border: none;
+                        border-radius: 8px;
+                        font-size: 16px;
+                        cursor: pointer;
+                    }
+                    .accept-btn {
+                        background: #4CAF50;
+                        color: white;
+                    }
+                    .reject-btn {
+                        background: #f44336;
+                        color: white;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(modal);
+            window.currentCallModal = modal;
+        }
+
+        function acceptCall(callId) {
+            if (window.currentCallModal) {
+                window.currentCallModal.remove();
+            }
+            window.location.href = `/chat/call/${callId}/`;
+        }
+
+        function rejectCall() {
+            if (window.currentCallModal) {
+                window.currentCallModal.remove();
+            }
+        }
+    </script>
+    {% endif %}
 </body>
 </html>
 
