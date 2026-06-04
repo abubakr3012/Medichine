@@ -14,6 +14,22 @@
 
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
+    <style>
+
+        .brand-logo {
+
+            height: 48px;
+
+            width: auto;
+
+            display: block;
+
+            object-fit: contain;
+
+        }
+
+    </style>
+
     <script>
 
 
@@ -45,9 +61,7 @@
 
             <a class="site-brand" href="{% url 'redirect_dashboard' %}">
 
-                <span class="brand-icon">M</span>
-
-                <span>Medichine</span>
+                <img src="../../media/TwinChat.png" alt="Medichine" class="brand-logo">
 
             </a>
 
