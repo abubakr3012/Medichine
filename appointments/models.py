@@ -22,6 +22,7 @@ class Appointment(models.Model):
     status = models.CharField(max_length=30, choices=STATUS, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     celery_task_ids = models.JSONField(default=list, blank=True)
+    sms_reminder_sent = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if not self.slug:
