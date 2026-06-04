@@ -17,6 +17,12 @@ class AppointmentCreateView(LoginRequiredMixin,generic.CreateView):
     success_url=reverse_lazy('appointments')
     template_name='appoinments/appoinments.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        # Только пациенты могут создавать записи
+        if request.user.role != 'patient':
+            return redirect('appointments')
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         doctor=get_object_or_404(DoctorProfile,pk=self.kwargs['pk'])
         form.instance.doctor=doctor
@@ -34,6 +40,27 @@ class AppointmentListView(LoginRequiredMixin,generic.ListView):
             date__lte=timezone.now()
         ).update(status='approved')
 
+        user = self.request.user
+        
+        # Пациенты видят только свои записи
+        if user.role == 'patient':
+            return Appointment.objects.select_related('doctor').filter(
+                is_deleted=False,
+                patient=user
+            )
+        
+        # Врачи видят только записи к ним
+        elif user.role == 'doctor':
+            try:
+                doctor_profile = user.doctor_profile
+                return Appointment.objects.select_related('patient').filter(
+                    is_deleted=False,
+                    doctor=doctor_profile
+                )
+            except DoctorProfile.DoesNotExist:
+                return Appointment.objects.none()
+        
+        # Админы видят все записи
         return Appointment.objects.select_related('doctor').filter(is_deleted=False)
 
 class AppointmentDeleteView(LoginRequiredMixin,generic.DeleteView):
@@ -41,6 +68,25 @@ class AppointmentDeleteView(LoginRequiredMixin,generic.DeleteView):
     model=Appointment
     slug_field='slug'
     slug_url_kwarg='slug'
+    
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Appointment.objects.filter(is_deleted=False)
+        
+        # Пациенты могут удалять только свои записи
+        if user.role == 'patient':
+            return queryset.filter(patient=user)
+        
+        # Врачи могут удалять только записи к ним
+        elif user.role == 'doctor':
+            try:
+                doctor_profile = user.doctor_profile
+                return queryset.filter(doctor=doctor_profile)
+            except DoctorProfile.DoesNotExist:
+                return Appointment.objects.none()
+        
+        # Админы могут удалять все записи
+        return queryset
     
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -58,9 +104,31 @@ class AppointmentUpdateView(LoginRequiredMixin,generic.UpdateView):
     slug_field='slug'
     slug_url_kwarg='slug'
     template_name='appoinments/update_appointment.html'
+    
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Appointment.objects.filter(is_deleted=False)
+        
+        # Пациенты могут редактировать только свои записи
+        if user.role == 'patient':
+            return queryset.filter(patient=user)
+        
+        # Врачи могут редактировать только записи к ним
+        elif user.role == 'doctor':
+            try:
+                doctor_profile = user.doctor_profile
+                return queryset.filter(doctor=doctor_profile)
+            except DoctorProfile.DoesNotExist:
+                return Appointment.objects.none()
+        
+        # Админы могут редактировать все записи
+        return queryset
 
 @login_required(login_url='login')
 def appointment_create(request, pk):
+    # Только пациенты могут создавать записи
+    if request.user.role != 'patient':
+        return redirect('appointments')
 
     doctor = DoctorProfile.objects.get(id=pk)
 

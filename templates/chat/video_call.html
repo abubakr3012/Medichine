@@ -254,6 +254,11 @@ ws.onmessage = async (event) => {
 
 async function startCall() {
     try {
+        // Проверка поддержки mediaDevices
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('Ваш браузер не поддерживает доступ к медиа устройствам. Убедитесь, что вы используете HTTPS или localhost.');
+        }
+        
         localStream = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: true
@@ -289,12 +294,19 @@ async function startCall() {
         
         statusDiv.textContent = 'Ожидание ответа...';
     } catch (error) {
+        console.error('Error in startCall:', error);
         statusDiv.textContent = 'Ошибка: ' + error.message;
+        alert('Ошибка доступа к камере/микрофону: ' + error.message + '\n\nУбедитесь, что:\n1. Вы разрешили доступ к медиа устройствам\n2. Сайт открыт по HTTPS или localhost\n3. Ваш браузер поддерживает WebRTC');
     }
 }
 
 async function handleOffer(offer) {
     try {
+        // Проверка поддержки mediaDevices
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('Ваш браузер не поддерживает доступ к медиа устройствам. Убедитесь, что вы используете HTTPS или localhost.');
+        }
+        
         localStream = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: true
@@ -331,7 +343,9 @@ async function handleOffer(offer) {
         
         statusDiv.textContent = 'Соединение установлено';
     } catch (error) {
+        console.error('Error in handleOffer:', error);
         statusDiv.textContent = 'Ошибка: ' + error.message;
+        alert('Ошибка доступа к камере/микрофону: ' + error.message + '\n\nУбедитесь, что:\n1. Вы разрешили доступ к медиа устройствам\n2. Сайт открыт по HTTPS или localhost\n3. Ваш браузер поддерживает WebRTC');
     }
 }
 
