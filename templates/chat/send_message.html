@@ -703,6 +703,14 @@ recordBtn.addEventListener("click", async (e) => {
 
 document.getElementById("photo-input").addEventListener("change", updateFileLabel);
 
+// Handle Enter key in text input to submit form
+document.getElementById("text-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        document.getElementById("chat-form").dispatchEvent(new Event("submit"));
+    }
+});
+
 function updateFileLabel() {
     const photo = document.getElementById("photo-input").files;
     const voice = document.getElementById("voice-input").files;
