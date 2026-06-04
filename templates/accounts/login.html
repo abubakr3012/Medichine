@@ -11,12 +11,7 @@
     <label for="password">Пароль</label>
     <div class="password-wrapper">
         <input type="password" placeholder="Введите пароль" name="password" id="password">
-        <button type="button" class="toggle-password" onclick="togglePassword('password')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-            </svg>
-        </button>
+        <button type="button" class="toggle-password" onclick="togglePassword('password')" aria-label="Показать пароль" title="Показать пароль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </div>
     
     <button type="submit">Войти</button>
@@ -35,61 +30,80 @@
     position: relative;
     display: flex;
     align-items: center;
-    gap: 8px;
+    margin-bottom: 0;
 }
 
 .password-wrapper input {
-    flex: 1;
+    width: 100%;
+    padding-right: 46px !important;
     min-width: 0;
 }
 
 .toggle-password {
-    background: rgba(102, 126, 234, 0.1);
+    position: absolute;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    margin-top: -50px;
+    background: transparent;
     border: none;
     cursor: pointer;
-    color: #667eea;
-    padding: 8px;
+    color: var(--text-3, #94a3b8);
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 6px;
-    transition: all 0.2s ease;
+    padding: 0;
+    transition: color var(--t, 200ms) ease,
+                background var(--t-fast, 150ms) ease,
+                transform 100ms ease;
     flex-shrink: 0;
+    outline: none;
+    box-shadow: none;
+    min-height: unset;
 }
 
 .toggle-password:hover {
-    background: rgba(102, 126, 234, 0.2);
-    color: #5568d3;
-    transform: scale(1.05);
+    color: var(--primary, #667eea);
+    background: var(--primary-muted, rgba(102, 126, 234, 0.12));
+    transform: none;
+    box-shadow: none;
 }
 
 .toggle-password:active {
-    transform: scale(0.95);
+    transform: scale(0.88);
+}
+
+.toggle-password svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+    transition: opacity 120ms ease;
+    pointer-events: none;
+}
+
+.toggle-password.fading svg {
+    opacity: 0;
 }
 </style>
 
 <script>
+const EYE_OPEN = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const EYE_OFF  = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+
 function togglePassword(fieldId) {
     const field = document.getElementById(fieldId);
-    const button = field.parentElement.querySelector('.toggle-password');
-    
-    if (field.type === 'password') {
-        field.type = 'text';
-        button.innerHTML = `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                <line x1="1" y1="1" x2="23" y2="23"/>
-            </svg>
-        `;
-    } else {
-        field.type = 'password';
-        button.innerHTML = `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-            </svg>
-        `;
-    }
+    const btn   = field.parentElement.querySelector('.toggle-password');
+    const show  = field.type === 'password';
+
+    btn.classList.add('fading');
+    setTimeout(() => {
+        field.type = show ? 'text' : 'password';
+        btn.innerHTML = show ? EYE_OFF : EYE_OPEN;
+        btn.setAttribute('aria-label', show ? 'Скрыть пароль' : 'Показать пароль');
+        btn.setAttribute('title',      show ? 'Скрыть пароль' : 'Показать пароль');
+        btn.classList.remove('fading');
+    }, 120);
 }
 </script>
 {% endblock %}
