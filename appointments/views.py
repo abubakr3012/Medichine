@@ -54,9 +54,9 @@ class AppointmentListView(LoginRequiredMixin,generic.ListView):
         # Врачи видят только записи к ним
         elif user.role == 'doctor':
             try:
-                doctor_profile = user.doctor_profile
+                doctor_profile = user.doctorprofile
                 return base_queryset.filter(doctor=doctor_profile)
-            except DoctorProfile.DoesNotExist:
+            except (DoctorProfile.DoesNotExist, AttributeError):
                 return Appointment.objects.none()
         
         # Админы видят все записи
@@ -83,9 +83,9 @@ class AppointmentDeleteView(LoginRequiredMixin,generic.DeleteView):
         # Врачи могут удалять только записи к ним
         elif user.role == 'doctor':
             try:
-                doctor_profile = user.doctor_profile
+                doctor_profile = user.doctorprofile
                 return queryset.filter(doctor=doctor_profile)
-            except DoctorProfile.DoesNotExist:
+            except (DoctorProfile.DoesNotExist, AttributeError):
                 return Appointment.objects.none()
         
         # Админы могут удалять все записи
@@ -119,9 +119,9 @@ class AppointmentUpdateView(LoginRequiredMixin,generic.UpdateView):
         # Врачи могут редактировать только записи к ним
         elif user.role == 'doctor':
             try:
-                doctor_profile = user.doctor_profile
+                doctor_profile = user.doctorprofile
                 return queryset.filter(doctor=doctor_profile)
-            except DoctorProfile.DoesNotExist:
+            except (DoctorProfile.DoesNotExist, AttributeError):
                 return Appointment.objects.none()
         
         # Админы могут редактировать все записи
