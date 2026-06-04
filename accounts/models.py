@@ -12,7 +12,8 @@ class User(AbstractUser):
 
     role = models.CharField(
         max_length=20,
-        choices=ROLE_CHOICES
+        choices=ROLE_CHOICES,
+        default='patient'
     )
 
     phone = models.CharField(

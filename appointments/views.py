@@ -42,26 +42,29 @@ class AppointmentListView(LoginRequiredMixin,generic.ListView):
 
         user = self.request.user
         
+        # Безопасность: по умолчанию показываем только свои записи
+        base_queryset = Appointment.objects.select_related('doctor', 'patient').filter(
+            is_deleted=False
+        )
+        
         # Пациенты видят только свои записи
         if user.role == 'patient':
-            return Appointment.objects.select_related('doctor').filter(
-                is_deleted=False,
-                patient=user
-            )
+            return base_queryset.filter(patient=user)
         
         # Врачи видят только записи к ним
         elif user.role == 'doctor':
             try:
                 doctor_profile = user.doctor_profile
-                return Appointment.objects.select_related('patient').filter(
-                    is_deleted=False,
-                    doctor=doctor_profile
-                )
+                return base_queryset.filter(doctor=doctor_profile)
             except DoctorProfile.DoesNotExist:
                 return Appointment.objects.none()
         
         # Админы видят все записи
-        return Appointment.objects.select_related('doctor').filter(is_deleted=False)
+        elif user.role == 'admin':
+            return base_queryset
+        
+        # Если роль не определена - показываем только свои записи для безопасности
+        return base_queryset.filter(patient=user)
 
 class AppointmentDeleteView(LoginRequiredMixin,generic.DeleteView):
     
