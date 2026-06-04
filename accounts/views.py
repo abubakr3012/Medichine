@@ -75,6 +75,8 @@ def register(request):
 
         if password!=password2:
             return render(request,'accounts/register.html',{"error":'passwords are not match'})
+        if len(password) < 8:
+            return render(request,'accounts/register.html',{"error":'Password must be at least 8 characters'})
         if User.objects.filter(phone=phone).exists():
             return render(request, 'accounts/register.html', {'error': 'This phone is already used'})
         elif User.objects.filter(username=username).exists():
@@ -173,6 +175,11 @@ def reset_confirm(request):
         if password != password2:
             return render(request, 'accounts/reset_confirm.html', {
                 'error': 'Passwords are not match',
+                'email': email
+            })
+        if len(password) < 8:
+            return render(request, 'accounts/reset_confirm.html', {
+                'error': 'Password must be at least 8 characters',
                 'email': email
             })
 
