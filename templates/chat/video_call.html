@@ -26,6 +26,10 @@
     </div>
 
     <div class="call-controls">
+        {% if not is_caller %}
+        <button id="rejectBtn" class="control-btn reject-call">❌</button>
+        <button id="acceptBtn" class="control-btn accept-call">✅</button>
+        {% endif %}
         <button id="muteBtn" class="control-btn">🎤</button>
         <button id="videoBtn" class="control-btn">📹</button>
         <button id="endCallBtn" class="control-btn end-call">📞</button>
@@ -132,6 +136,24 @@
 
 .control-btn.end-call:hover {
     box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+}
+
+.control-btn.reject-call {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+}
+
+.control-btn.reject-call:hover {
+    box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+}
+
+.control-btn.accept-call {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+}
+
+.control-btn.accept-call:hover {
+    box-shadow: 0 6px 20px rgba(72, 187, 120, 0.6);
 }
 
 .control-btn.active {
@@ -359,6 +381,28 @@ videoBtn.addEventListener('click', () => {
 });
 
 endCallBtn.addEventListener('click', endCall);
+
+const rejectBtn = document.getElementById('rejectBtn');
+const acceptBtn = document.getElementById('acceptBtn');
+
+if (rejectBtn) {
+    rejectBtn.addEventListener('click', () => {
+        fetch(`/chat/call/${callId}/reject/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        }).then(() => {
+            window.location.href = "{% url 'show_messages' %}";
+        });
+    });
+}
+
+if (acceptBtn) {
+    acceptBtn.addEventListener('click', async () => {
+        await handleOffer(offer);
+    });
+}
 
 window.addEventListener('beforeunload', () => {
     endCall();

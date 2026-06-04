@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from accounts.models import Profile
 from .forms import DirectForm
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -159,12 +160,12 @@ def delete_chat(request, pk):
 def start_video_call(request, user_id):
     from channels.layers import get_channel_layer
     from asgiref.sync import async_to_sync
-    
+
     receiver = get_object_or_404(User, pk=user_id)
-    
+
     if receiver == request.user:
         return redirect('show_messages')
-    
+
     # Создаем новый вызов
     call = Call.objects.create(
         caller=request.user,
@@ -172,7 +173,7 @@ def start_video_call(request, user_id):
         call_type='video',
         status='pending'
     )
-    
+
     # Отправляем уведомление через WebSocket получателю
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
@@ -184,28 +185,63 @@ def start_video_call(request, user_id):
             "caller_name": request.user.username,
         }
     )
-    
+
     return redirect('video_call', call_id=call.id)
 
 
 @login_required(login_url='login')
 def video_call(request, call_id):
     call = get_object_or_404(Call, pk=call_id)
-    
+
     # Проверяем, что пользователь участвует в вызове
     if call.caller != request.user and call.receiver != request.user:
         return redirect('show_messages')
-    
+
     # Если вызов уже завершен, перенаправляем
     if call.status == 'ended':
         return redirect('show_messages')
-    
+
     # Если пользователь - получатель и вызов в ожидании, принимаем его
     if call.receiver == request.user and call.status == 'pending':
         call.status = 'accepted'
         call.save()
-    
+
+    # Если пользователь - получатель и отклонил вызов
+    if call.receiver == request.user and call.status == 'rejected':
+        # Создаем сообщение о пропущенном звонке
+        Direct.objects.create(
+            sender=call.caller,
+            receiner=call.receiver,
+            text=f'Пропущенный видеозвонок',
+            message_type='missed_call'
+        )
+        return redirect('show_messages')
+
     return render(request, 'chat/video_call.html', {
         'call': call,
         'is_caller': call.caller == request.user,
     })
+
+
+@login_required(login_url='login')
+def reject_call(request, call_id):
+    call = get_object_or_404(Call, pk=call_id)
+
+    # Проверяем, что пользователь является получателем
+    if call.receiver != request.user:
+        return redirect('show_messages')
+
+    # Обновляем статус вызова
+    call.status = 'rejected'
+    call.ended_at = timezone.now()
+    call.save()
+
+    # Создаем сообщение о пропущенном звонке
+    Direct.objects.create(
+        sender=call.caller,
+        receiner=call.receiver,
+        text=f'Пропущенный видеозвонок',
+        message_type='missed_call'
+    )
+
+    return redirect('show_messages')
