@@ -16,7 +16,6 @@
 
     <script>
 
-        /* Применяем сохранённую тему как можно раньше, чтобы не было мигания */
 
         (function () {
 
@@ -128,7 +127,6 @@
 
                 if (attr === 'dark' || attr === 'light') return attr;
 
-                /* Если тема не задана вручную — берём системную */
 
                 return window.matchMedia &&
 
@@ -176,7 +174,6 @@
 
     <script>
 
-        // WebSocket для глобальных уведомлений
 
         const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
 
@@ -202,7 +199,6 @@
 
         function showIncomingCall(data) {
 
-            // Создаем модальное окно для входящего звонка
 
             const modal = document.createElement("div");
 
@@ -230,7 +226,6 @@
 
             
 
-            // Добавляем стили если еще не добавлены
 
             if (!document.getElementById("incoming-call-styles")) {
 
@@ -377,8 +372,4 @@
     {% endif %}
 
 </body>
-
 </html>
-
-
-
