@@ -37,6 +37,12 @@ class Direct(models.Model):
     is_readed = models.BooleanField(default=False)
     photo = models.ImageField(upload_to='direct/', blank=True, null=True)
     voice = models.FileField(upload_to='voice/', blank=True, null=True)
+    message_type = models.CharField(max_length=20, default='text', choices=[
+        ('text', 'Text'),
+        ('photo', 'Photo'),
+        ('voice', 'Voice'),
+        ('missed_call', 'Missed Call'),
+    ])
 
     def __str__(self):
         return f'{self.sender.username}:{self.receiner.username}'
